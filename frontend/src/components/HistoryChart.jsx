@@ -44,39 +44,39 @@ function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
     if (isComparing) {
       const aqiDelta = (data.aqi1 != null && data.aqi2 != null) ? data.aqi1 - data.aqi2 : null;
       return (
-        <div className="glass-panel p-3.5 rounded-xl border border-slate-700/80 shadow-2xl text-xs space-y-2.5 min-w-[240px]">
-          <div className="font-mono text-[11px] text-slate-400 border-b border-slate-800 pb-1 flex items-center justify-between">
+        <div className="glass-panel p-3.5 rounded-xl border border-white/[0.08] shadow-2xl text-xs space-y-2.5 min-w-[240px] bg-slate-950/95 backdrop-blur-xl">
+          <div className="font-mono text-[11px] text-slate-400 border-b border-white/[0.06] pb-1.5 flex items-center justify-between">
             <span>{label}</span>
-            <span className="text-cyan-400 font-bold uppercase tracking-wider text-[9px] bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800/60">
+            <span className="text-teal-300 font-bold uppercase tracking-wider text-[9px] bg-teal-950/60 px-1.5 py-0.5 rounded border border-teal-800/40">
               Comparative Telemetry
             </span>
           </div>
 
           {/* City 1 Metrics */}
-          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-cyan-500/30 space-y-1">
+          <div className="bg-slate-900/70 p-2.5 rounded-lg border border-teal-500/20 space-y-1">
             <div className="flex items-center justify-between font-bold">
-              <span className="text-cyan-300 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span className="text-teal-300 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-teal-400"></span>
                 {data.city1 || city1}
               </span>
-              <span style={{ color: data.color1 || '#38BDF8' }} className="font-mono">
+              <span style={{ color: data.color1 || '#2DD4BF' }} className="font-mono font-semibold">
                 AQI {data.aqi1 ?? 'N/A'} {data.category1 ? `(${data.category1})` : ''}
               </span>
             </div>
             <div className="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>PM2.5: <strong className="text-cyan-300 font-mono">{data.pm251 ?? 'N/A'} µg/m³</strong></span>
+              <span>PM2.5: <strong className="text-teal-300 font-mono">{data.pm251 ?? 'N/A'} µg/m³</strong></span>
               <span>{data.temp1 != null ? `${data.temp1}°C` : ''} {data.hum1 != null ? `| ${data.hum1}%` : ''}</span>
             </div>
           </div>
 
           {/* City 2 Metrics */}
-          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-amber-500/30 space-y-1">
+          <div className="bg-slate-900/70 p-2.5 rounded-lg border border-amber-500/20 space-y-1">
             <div className="flex items-center justify-between font-bold">
-              <span className="text-amber-400 flex items-center gap-1.5">
+              <span className="text-amber-300 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                 {data.city2 || city2}
               </span>
-              <span style={{ color: data.color2 || '#F59E0B' }} className="font-mono">
+              <span style={{ color: data.color2 || '#F59E0B' }} className="font-mono font-semibold">
                 AQI {data.aqi2 ?? 'N/A'} {data.category2 ? `(${data.category2})` : ''}
               </span>
             </div>
@@ -88,9 +88,9 @@ function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
 
           {/* Difference Summary */}
           {aqiDelta != null && (
-            <div className="text-[11px] pt-1.5 border-t border-slate-800 text-slate-300 flex items-center justify-between font-mono">
+            <div className="text-[11px] pt-1.5 border-t border-white/[0.06] text-slate-300 flex items-center justify-between font-mono">
               <span>AQI Delta:</span>
-              <span className={aqiDelta > 0 ? 'text-amber-400 font-bold' : aqiDelta < 0 ? 'text-cyan-400 font-bold' : 'text-slate-400'}>
+              <span className={aqiDelta > 0 ? 'text-amber-300 font-semibold' : aqiDelta < 0 ? 'text-teal-300 font-semibold' : 'text-slate-400'}>
                 {Math.abs(aqiDelta)} pts ({aqiDelta > 0 ? `${city1} +${aqiDelta}` : aqiDelta < 0 ? `${city2} +${Math.abs(aqiDelta)}` : 'Equal'})
               </span>
             </div>
@@ -101,8 +101,8 @@ function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
 
     // Single City Tooltip
     return (
-      <div className="glass-panel p-3.5 rounded-xl border border-slate-700/80 shadow-2xl text-xs space-y-1.5 min-w-[190px]">
-        <div className="font-mono text-[11px] text-slate-400 border-b border-slate-800 pb-1">
+      <div className="glass-panel p-3.5 rounded-xl border border-white/[0.08] shadow-2xl text-xs space-y-1.5 min-w-[190px] bg-slate-950/95 backdrop-blur-xl">
+        <div className="font-mono text-[11px] text-slate-400 border-b border-white/[0.06] pb-1">
           {label}
         </div>
         <div className="flex items-center justify-between gap-3">
@@ -112,7 +112,7 @@ function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
         <div className="flex items-center justify-between gap-3">
           <span className="text-slate-300 font-medium">AQI Score:</span>
           <span
-            style={{ color: data.color_hex || '#00E400' }}
+            style={{ color: data.color_hex || '#2DD4BF' }}
             className="font-bold text-sm"
           >
             {data.aqi} {data.category ? `(${data.category})` : ''}
@@ -120,7 +120,7 @@ function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
         </div>
         <div className="flex items-center justify-between gap-3">
           <span className="text-slate-300 font-medium">PM2.5:</span>
-          <span className="font-mono font-semibold text-cyan-400">{data.pm25} µg/m³</span>
+          <span className="font-mono font-semibold text-teal-300">{data.pm25} µg/m³</span>
         </div>
         {data.pm10 != null && (
           <div className="flex items-center justify-between gap-3">
@@ -128,7 +128,7 @@ function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
             <span className="font-mono text-slate-300">{data.pm10} µg/m³</span>
           </div>
         )}
-        <div className="flex items-center justify-between gap-3 pt-1 border-t border-slate-800 text-[10px] text-slate-400">
+        <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/[0.06] text-[10px] text-slate-400">
           <span>Temp / Hum:</span>
           <span>{data.temperature}°C | {data.humidity}%</span>
         </div>
@@ -287,10 +287,10 @@ export default function HistoryChart({
   return (
     <div className="glass-panel rounded-2xl p-5 sm:p-7 border border-slate-800 shadow-xl">
       {/* Top Header & Export Controls */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-800">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/[0.06]">
         <div>
           <div className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-cyan-400" />
+            <BarChart3 className="w-5 h-5 text-teal-400" />
             <h2 className="text-xl font-bold text-white tracking-tight flex items-center">
               Historical Telemetry & Comparative Analytics
               <InfoTooltip text="Aggregated over 15-second tumbling windows with 30-second watermarking via Apache Spark." />
@@ -298,46 +298,46 @@ export default function HistoryChart({
           </div>
         </div>
 
-        {/* 3 Prominent Action Export Buttons */}
+        {/* 3 Action Export Buttons with Refined SaaS Styling */}
         <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
           <button
             onClick={handleExportPDF}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 active:scale-95 text-xs font-semibold text-white shadow-md shadow-rose-900/20 transition"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] active:scale-95 text-xs font-semibold text-rose-300 shadow-sm transition"
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-4 h-4 text-rose-400" />
             <span>Export PDF Report</span>
           </button>
 
           <button
             onClick={handleExportExcel}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-xs font-semibold text-white shadow-md shadow-emerald-900/20 transition"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] active:scale-95 text-xs font-semibold text-emerald-300 shadow-sm transition"
           >
-            <FileSpreadsheet className="w-4 h-4" />
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
             <span>Export Excel (.xlsx)</span>
           </button>
 
           <button
             onClick={handleExportCSV}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-xs font-semibold text-slate-200 border border-slate-700 transition"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] active:scale-95 text-xs font-semibold text-teal-300 shadow-sm transition"
           >
-            <Download className="w-4 h-4 text-cyan-400" />
+            <Download className="w-4 h-4 text-teal-400" />
             <span>Export CSV</span>
           </button>
         </div>
       </div>
 
       {/* Filter Bar with Dual-City Comparison Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 mb-6 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 items-end">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 mb-6 bg-slate-900/60 p-3.5 rounded-xl border border-white/[0.04] items-end">
         {/* City 1 (Primary) */}
         <div className="lg:col-span-3">
-          <label className="block text-[11px] font-semibold text-cyan-400 mb-1 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <label className="block text-[11px] font-semibold text-teal-400 mb-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-teal-400"></span>
             <span>City 1 (Primary)</span>
           </label>
           <select
             value={selectedCity}
             onChange={(e) => onCityChange(e.target.value)}
-            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-cyan-400 focus:outline-none"
+            className="w-full bg-slate-800/90 border border-white/[0.08] text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-teal-400/50 focus:outline-none"
           >
             {CITIES.map((c) => (
               <option key={c} value={c}>
@@ -354,7 +354,7 @@ export default function HistoryChart({
             onClick={handleSwapCities}
             disabled={!isComparing}
             title="Swap cities"
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-cyan-300 border border-slate-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-teal-300 border border-white/[0.08] transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ArrowRightLeft className="w-3.5 h-3.5" />
           </button>
@@ -369,7 +369,7 @@ export default function HistoryChart({
           <select
             value={compareCity}
             onChange={(e) => onCompareCityChange(e.target.value)}
-            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-amber-400 focus:outline-none"
+            className="w-full bg-slate-800/90 border border-white/[0.08] text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-amber-400/50 focus:outline-none"
           >
             <option value="none">-- None (Single City View) --</option>
             {CITIES.map((c) => (
@@ -388,7 +388,7 @@ export default function HistoryChart({
           <select
             value={limit}
             onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-cyan-400 focus:outline-none"
+            className="w-full bg-slate-800/90 border border-white/[0.08] text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-teal-400/50 focus:outline-none"
           >
             <option value={20}>20 points</option>
             <option value={50}>50 points</option>
@@ -402,7 +402,7 @@ export default function HistoryChart({
           <button
             onClick={onRefreshHistory}
             disabled={isLoading}
-            className="w-full px-3.5 py-1.5 h-[34px] rounded-lg bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition shadow-sm"
+            className="w-full px-3.5 py-1.5 h-[34px] rounded-lg bg-teal-600 hover:bg-teal-500 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition shadow-md shadow-teal-950/30"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             <span>Apply Filter</span>
@@ -412,11 +412,11 @@ export default function HistoryChart({
 
       {/* Chart Metric Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-semibold overflow-x-auto">
+        <div className="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-lg border border-white/[0.06] text-xs font-semibold overflow-x-auto">
           <button
             onClick={() => setActiveMetric('both')}
             className={`px-3 py-1 rounded-md transition whitespace-nowrap ${
-              activeMetric === 'both' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              activeMetric === 'both' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             {isComparing ? 'AQI & PM2.5 Both Cities' : 'AQI & PM2.5 Combined'}
@@ -424,7 +424,7 @@ export default function HistoryChart({
           <button
             onClick={() => setActiveMetric('aqi')}
             className={`px-3 py-1 rounded-md transition whitespace-nowrap ${
-              activeMetric === 'aqi' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              activeMetric === 'aqi' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             {isComparing ? 'AQI Comparison Only' : 'AQI Index Only'}
@@ -432,7 +432,7 @@ export default function HistoryChart({
           <button
             onClick={() => setActiveMetric('pm25')}
             className={`px-3 py-1 rounded-md transition whitespace-nowrap ${
-              activeMetric === 'pm25' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
+              activeMetric === 'pm25' ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
             {isComparing ? 'PM2.5 Comparison Only' : 'PM2.5 Only (µg/m³)'}
@@ -441,12 +441,12 @@ export default function HistoryChart({
 
         <div className="flex items-center gap-2 text-xs font-mono">
           {isComparing && (
-            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-semibold">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-teal-950/50 text-teal-300 border border-teal-800/40 font-semibold">
               <GitCompare className="w-3 h-3" />
               <span>Comparing: {selectedCity} vs {compareCity}</span>
             </span>
           )}
-          <span className="text-slate-400">
+          <span className="text-slate-400 font-mono text-[11px]">
             {chartData.length} points
           </span>
         </div>
@@ -455,7 +455,7 @@ export default function HistoryChart({
       {/* Recharts ResponsiveContainer */}
       <div className="w-full h-[360px] sm:h-[430px]">
         {chartData.length === 0 ? (
-          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 border border-dashed border-slate-800 rounded-xl">
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 border border-dashed border-white/[0.08] rounded-xl">
             <BarChart3 className="w-8 h-8 text-slate-600 mb-2" />
             <p className="text-sm">No historical telemetry points available for this range.</p>
             <span className="text-xs text-slate-500 mt-1">
@@ -466,17 +466,18 @@ export default function HistoryChart({
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={chartData} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
               <defs>
+                {/* Refined, low-opacity gradients blending organically into the dark card surface */}
                 <linearGradient id="aqiGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#38BDF8" stopOpacity={0.0} />
+                  <stop offset="0%" stopColor="#2DD4BF" stopOpacity={0.14} />
+                  <stop offset="100%" stopColor="#2DD4BF" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="compareAqiGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.0} />
+                  <stop offset="0%" stopColor="#F59E0B" stopOpacity={0.12} />
+                  <stop offset="100%" stopColor="#F59E0B" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" strokeOpacity={0.25} vertical={false} />
 
               <XAxis
                 dataKey="window_start"
@@ -508,27 +509,30 @@ export default function HistoryChart({
               <Tooltip content={<CustomTooltip isComparing={isComparing} city1={selectedCity} city2={compareCity} />} />
               <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px' }} />
 
-              {/* Standard EPA Reference Breakpoints */}
+              {/* Standard EPA Reference Breakpoints with desaturated tones */}
               <ReferenceLine
                 yAxisId="left"
                 y={50}
-                stroke="#00E400"
+                stroke="#10B981"
+                strokeOpacity={0.5}
                 strokeDasharray="4 4"
-                label={{ value: 'Good (50)', fill: '#00E400', fontSize: 10, position: 'right' }}
+                label={{ value: 'Good (50)', fill: '#10B981', fontSize: 10, position: 'right' }}
               />
               <ReferenceLine
                 yAxisId="left"
                 y={100}
-                stroke="#FFFF00"
+                stroke="#F59E0B"
+                strokeOpacity={0.5}
                 strokeDasharray="4 4"
-                label={{ value: 'Moderate (100)', fill: '#FFFF00', fontSize: 10, position: 'right' }}
+                label={{ value: 'Moderate (100)', fill: '#F59E0B', fontSize: 10, position: 'right' }}
               />
               <ReferenceLine
                 yAxisId="left"
                 y={150}
-                stroke="#FF7E00"
+                stroke="#F97316"
+                strokeOpacity={0.5}
                 strokeDasharray="4 4"
-                label={{ value: 'Sensitive (150)', fill: '#FF7E00', fontSize: 10, position: 'right' }}
+                label={{ value: 'Sensitive (150)', fill: '#F97316', fontSize: 10, position: 'right' }}
               />
 
               {/* Comparative Dual-City Curves */}
@@ -541,8 +545,8 @@ export default function HistoryChart({
                       type="monotone"
                       dataKey="aqi1"
                       name={`AQI (${selectedCity})`}
-                      stroke="#38BDF8"
-                      strokeWidth={2.5}
+                      stroke="#2DD4BF"
+                      strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#aqiGradient)"
                     />
@@ -556,9 +560,9 @@ export default function HistoryChart({
                       dataKey="aqi2"
                       name={`AQI (${compareCity})`}
                       stroke="#F59E0B"
-                      strokeWidth={2.5}
-                      dot={{ r: 2.5, fill: '#F59E0B' }}
-                      activeDot={{ r: 5 }}
+                      strokeWidth={2}
+                      dot={{ r: 2, fill: '#F59E0B' }}
+                      activeDot={{ r: 4.5 }}
                     />
                   )}
 
@@ -569,10 +573,10 @@ export default function HistoryChart({
                       type="monotone"
                       dataKey="pm251"
                       name={`PM2.5 (${selectedCity})`}
-                      stroke="#2DD4BF"
-                      strokeWidth={1.8}
+                      stroke="#5EEAD4"
+                      strokeWidth={1.6}
                       strokeDasharray="4 4"
-                      dot={{ r: 2, fill: '#2DD4BF' }}
+                      dot={{ r: 2, fill: '#5EEAD4' }}
                     />
                   )}
 
@@ -583,10 +587,10 @@ export default function HistoryChart({
                       type="monotone"
                       dataKey="pm252"
                       name={`PM2.5 (${compareCity})`}
-                      stroke="#FB7185"
-                      strokeWidth={1.8}
+                      stroke="#FCA5A5"
+                      strokeWidth={1.6}
                       strokeDasharray="4 4"
-                      dot={{ r: 2, fill: '#FB7185' }}
+                      dot={{ r: 2, fill: '#FCA5A5' }}
                     />
                   )}
                 </>
@@ -599,8 +603,8 @@ export default function HistoryChart({
                       type="monotone"
                       dataKey="aqi"
                       name="AQI Score"
-                      stroke="#38BDF8"
-                      strokeWidth={2.5}
+                      stroke="#2DD4BF"
+                      strokeWidth={2}
                       fillOpacity={1}
                       fill="url(#aqiGradient)"
                     />
@@ -613,9 +617,9 @@ export default function HistoryChart({
                       dataKey="pm25"
                       name="PM2.5 (µg/m³)"
                       stroke="#F59E0B"
-                      strokeWidth={2}
-                      dot={{ r: 2.5, fill: '#F59E0B' }}
-                      activeDot={{ r: 5 }}
+                      strokeWidth={1.8}
+                      dot={{ r: 2, fill: '#F59E0B' }}
+                      activeDot={{ r: 4.5 }}
                     />
                   )}
                 </>

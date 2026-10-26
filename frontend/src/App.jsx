@@ -102,7 +102,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B1120] text-slate-100">
+    <div className="min-h-screen flex flex-col bg-[#0B1329] text-slate-100">
       {/* Platform Navigation */}
       <Navbar
         lastUpdated={lastUpdated}
@@ -117,7 +117,7 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-cyan-400" />
+                <MapPin className="w-5 h-5 text-teal-400" />
                 <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center">
                   Real-Time Philippine City Telemetry
                   <InfoTooltip text="Real-time atmospheric monitoring across major urban centers. Click any card to visualize its historical trend." />
@@ -126,16 +126,16 @@ export default function App() {
             </div>
 
             {/* Interactive Sorting Dropdown */}
-            <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-900/70 p-1.5 rounded-xl border border-slate-800 shadow-sm">
+            <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-900/80 p-1.5 rounded-xl border border-white/[0.06] shadow-sm">
               <label htmlFor="card-sort" className="text-xs text-slate-400 flex items-center gap-1.5 pl-1.5 font-medium">
-                <ArrowUpDown className="w-3.5 h-3.5 text-cyan-400" />
+                <ArrowUpDown className="w-3.5 h-3.5 text-teal-400" />
                 <span className="hidden sm:inline">Sort:</span>
               </label>
               <select
                 id="card-sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 text-cyan-300 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer transition shadow-sm"
+                className="bg-slate-800/90 hover:bg-slate-800 border border-white/[0.08] text-teal-300 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal-400/50 cursor-pointer transition shadow-sm"
               >
                 <option value="aqi_desc" className="bg-slate-900 text-slate-200">AQI: Highest First</option>
                 <option value="aqi_asc" className="bg-slate-900 text-slate-200">AQI: Lowest First (Cleanest)</option>
@@ -145,7 +145,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Region Tabs */}
+          {/* Region Tabs with Soft Teal Branding */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 text-xs font-semibold">
             {['All', 'NCR', 'Luzon', 'Visayas', 'Mindanao'].map((reg) => {
               const count = reg === 'All' 
@@ -161,8 +161,8 @@ export default function App() {
                   }}
                   className={`px-3 py-1.5 rounded-xl border transition whitespace-nowrap active:scale-95 ${
                     isActive
-                      ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-bold shadow-md shadow-cyan-900/20'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                      ? 'bg-teal-500/20 text-teal-300 border-teal-500/40 font-bold shadow-md shadow-teal-950/20'
+                      : 'bg-slate-900/60 border-white/[0.06] text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
                   }`}
                 >
                   {reg} ({count})
@@ -171,7 +171,7 @@ export default function App() {
             })}
           </div>
 
-          {/* Responsive Grid of City Cards (First 4 cards displayed by default) */}
+          {/* Responsive Grid of City Cards (Clean 4-column responsive layout without horizontal overlap) */}
           {(() => {
             // Filter by selected region
             const regionList = liveCities.filter((metric) => {
@@ -192,8 +192,8 @@ export default function App() {
             const displayed = sortedList.slice(0, visibleCount);
 
             return (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="space-y-4 w-full min-w-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 w-full min-w-0">
                   {displayed.map((metric) => (
                     <AQICard
                       key={metric.city}
@@ -206,29 +206,29 @@ export default function App() {
 
                 {/* Progressive Expansion and Collapse Controls */}
                 {sortedList.length > 4 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800/60">
                     <span className="text-xs text-slate-400 font-medium order-2 sm:order-1">
-                      Showing <strong className="text-cyan-300 font-bold">{displayed.length}</strong> of{' '}
+                      Showing <strong className="text-teal-300 font-bold">{displayed.length}</strong> of{' '}
                       <strong className="text-white font-bold">{sortedList.length}</strong> stations
                     </span>
 
                     <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2">
-                      {/* See More Button: adds 2 more rows (+8 cards in 4-column layout) */}
+                      {/* See More Button */}
                       {visibleCount < sortedList.length && (
                         <button
                           onClick={() => setVisibleCount((prev) => Math.min(prev + 8, sortedList.length))}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-cyan-300 hover:text-cyan-200 transition active:scale-95 shadow-sm"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] text-xs font-semibold text-teal-300 hover:text-teal-200 transition active:scale-95 shadow-sm"
                         >
-                          <ChevronDown className="w-4 h-4 text-cyan-400" />
+                          <ChevronDown className="w-4 h-4 text-teal-400" />
                           <span>See More</span>
                         </button>
                       )}
 
-                      {/* See All Button: expands to reveal all cards */}
+                      {/* See All Button */}
                       {visibleCount < sortedList.length && (
                         <button
                           onClick={() => setVisibleCount(sortedList.length)}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600/80 hover:bg-cyan-500 text-xs font-bold text-white transition active:scale-95 shadow-md shadow-cyan-950"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-xs font-semibold text-white transition active:scale-95 shadow-md shadow-teal-950/40"
                         >
                           <ChevronsDown className="w-4 h-4" />
                           <span>See All ({sortedList.length})</span>
@@ -239,7 +239,7 @@ export default function App() {
                       {visibleCount > 4 && (
                         <button
                           onClick={() => setVisibleCount(4)}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-300 hover:text-white transition active:scale-95 shadow-sm"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] text-xs font-semibold text-slate-300 hover:text-white transition active:scale-95 shadow-sm"
                         >
                           <ChevronUp className="w-4 h-4 text-slate-400" />
                           <span>Collapse to Top 4</span>
