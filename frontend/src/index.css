@@ -179,8 +179,12 @@ html:not(.dark) .leaflet-popup-content-wrapper,
   border: 1px solid rgba(203, 213, 225, 0.8) !important;
   border-radius: 14px !important;
   box-shadow: 0 15px 30px -5px rgba(100, 116, 139, 0.2) !important;
-  padding: 4px !important;
   color: #0F172A !important;
+}
+
+.airsupply-leaflet-popup .leaflet-popup-content {
+  margin: 8px 10px !important;
+  line-height: 1.35 !important;
 }
 
 .dark .leaflet-popup-tip {

@@ -401,7 +401,7 @@ export default function HistoryChart({
             className="w-full bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-teal-400/50 focus:outline-none"
           >
             {CITIES.map((c) => (
-              <option key={c} value={c}>
+              <option key={c} value={c} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                 {c}
               </option>
             ))}
@@ -432,9 +432,9 @@ export default function HistoryChart({
             onChange={(e) => onCompareCityChange(e.target.value)}
             className="w-full bg-white dark:bg-slate-800/90 border border-slate-300 dark:border-white/[0.08] text-slate-900 dark:text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-amber-400/50 focus:outline-none"
           >
-            <option value="none">-- None (Single City View) --</option>
+            <option value="none" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">-- None (Single City View) --</option>
             {CITIES.map((c) => (
-              <option key={c} value={c} disabled={c.toLowerCase() === selectedCity.toLowerCase()}>
+              <option key={c} value={c} disabled={c.toLowerCase() === selectedCity.toLowerCase()} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                 {c} {c.toLowerCase() === selectedCity.toLowerCase() ? '(Active)' : ''}
               </option>
             ))}

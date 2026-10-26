@@ -223,37 +223,49 @@ export default function PhilippineMap({
         popupAnchor: [0, -((pinSize + 14) / 2)]
       });
 
+      // Adaptive color tokens based on active theme
+      const popupTitleColor = isDark ? '#ffffff' : '#0f172a';
+      const popupSubColor = isDark ? '#94a3b8' : '#64748b';
+      const popupBorderColor = isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0';
+      const statsBoxBg = isDark ? 'rgba(15, 23, 42, 0.75)' : '#f1f5f9';
+      const statsBoxBorder = isDark ? 'rgba(255, 255, 255, 0.08)' : '#cbd5e1';
+      const statsLabelColor = isDark ? '#cbd5e1' : '#475569';
+      const statsValueColor = isDark ? '#f1f5f9' : '#0f172a';
+      const advisoryBoxBg = isDark ? 'rgba(2, 6, 23, 0.75)' : '#f8fafc';
+      const advisoryBoxBorder = isDark ? '#1e293b' : '#e2e8f0';
+      const advisoryTextColor = isDark ? '#cbd5e1' : '#334155';
+
       // Interactive Popup Content: Detailed stats displayed directly on the map
       const popupContent = `
-        <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 210px; color: #f8fafc; padding: 2px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 8px;">
+        <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 215px; padding: 2px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid ${popupBorderColor}; padding-bottom: 6px; margin-bottom: 8px;">
             <div>
-              <strong style="font-size: 13px; color: #ffffff; display: block;">${item.city}</strong>
-              <span style="font-size: 10px; color: #94a3b8; font-family: monospace;">Station: ${item.sensor_id}</span>
+              <strong style="font-size: 13px; font-weight: 700; color: ${popupTitleColor}; display: block; line-height: 1.2;">${item.city}</strong>
+              <span style="font-size: 10px; color: ${popupSubColor}; font-family: ui-monospace, monospace;">Station: ${item.sensor_id}</span>
             </div>
-            <span style="background-color: ${markerColor}25; color: ${aqiDisplayColor}; border: 1px solid ${markerColor}80; padding: 2px 7px; border-radius: 9999px; font-size: 9px; font-weight: bold; text-transform: uppercase;">
+            <span style="background-color: ${markerColor}20; color: ${aqiDisplayColor}; border: 1px solid ${markerColor}60; padding: 2px 7px; border-radius: 9999px; font-size: 9px; font-weight: 700; text-transform: uppercase;">
               ${item.category}
             </span>
           </div>
           <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px;">
             <span style="font-size: 28px; font-weight: 900; color: ${aqiDisplayColor}; line-height: 1;">${item.aqi}</span>
-            <span style="font-size: 10px; color: #94a3b8;">AQI / 300 scale</span>
+            <span style="font-size: 10px; color: ${popupSubColor}; font-weight: 500;">AQI / 300 scale</span>
           </div>
-          <div style="background: rgba(15, 23, 42, 0.65); padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 6px; font-family: monospace; font-size: 11px;">
+          <div style="background: ${statsBoxBg}; padding: 7px 9px; border-radius: 8px; border: 1px solid ${statsBoxBorder}; margin-bottom: 7px; font-family: ui-monospace, monospace; font-size: 11px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-              <span style="color: #cbd5e1;">PM2.5:</span>
-              <strong style="color: #38bdf8;">${Number(item.pm25).toFixed(1)} µg/m³</strong>
+              <span style="color: ${statsLabelColor};">PM2.5:</span>
+              <strong style="color: ${isDark ? '#38bdf8' : '#0284c7'};">${Number(item.pm25).toFixed(1)} µg/m³</strong>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-              <span style="color: #cbd5e1;">PM10:</span>
-              <strong style="color: #f1f5f9;">${Number(item.pm10).toFixed(1)} µg/m³</strong>
+              <span style="color: ${statsLabelColor};">PM10:</span>
+              <strong style="color: ${statsValueColor};">${Number(item.pm10).toFixed(1)} µg/m³</strong>
             </div>
-            <div style="display: flex; justify-content: space-between; color: #94a3b8; font-size: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 3px;">
-              <span>Temp: <strong style="color: #e2e8f0;">${Number(item.temperature).toFixed(1)}°C</strong></span>
-              <span>Hum: <strong style="color: #e2e8f0;">${Number(item.humidity).toFixed(1)}%</strong></span>
+            <div style="display: flex; justify-content: space-between; color: ${popupSubColor}; font-size: 10px; border-top: 1px solid ${popupBorderColor}; padding-top: 4px; margin-top: 3px;">
+              <span>Temp: <strong style="color: ${statsValueColor};">${Number(item.temperature).toFixed(1)}°C</strong></span>
+              <span>Hum: <strong style="color: ${statsValueColor};">${Number(item.humidity).toFixed(1)}%</strong></span>
             </div>
           </div>
-          <div style="background: rgba(2, 6, 23, 0.75); padding: 6px 8px; border-radius: 6px; font-size: 10px; color: #e2e8f0; line-height: 1.35; border: 1px solid #1e293b;">
+          <div style="background: ${advisoryBoxBg}; padding: 7px 9px; border-radius: 8px; font-size: 10px; color: ${advisoryTextColor}; line-height: 1.4; border: 1px solid ${advisoryBoxBorder};">
             ${item.health_advisory}
           </div>
         </div>
@@ -262,7 +274,7 @@ export default function PhilippineMap({
       // Hover Tooltip Content: Clean and un-cluttered
       const tooltipContent = `
         <div style="padding: 1px 3px; font-family: sans-serif; font-size: 11px;">
-          <div style="font-weight: 700; color: #ffffff;">${item.city}</div>
+          <div style="font-weight: 700; color: ${popupTitleColor};">${item.city}</div>
           <div style="color: ${aqiDisplayColor}; font-weight: 600; font-size: 10px;">${item.category} • AQI ${item.aqi}</div>
         </div>
       `;
@@ -306,7 +318,7 @@ export default function PhilippineMap({
         markersMap.set(item.city, marker);
       }
     });
-  }, [cities, selectedCity, onCitySelect]);
+  }, [cities, selectedCity, onCitySelect, isDark, theme]);
 
   // Whenever user selects a city from cards, map marker, or side panel,
   // automatically flyTo/center on that area and show the stats popup directly on the map
@@ -644,8 +656,8 @@ export default function PhilippineMap({
                       onClick={() => flyToCity(cityItem.city)}
                       className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold border transition text-left ${
                         isSelected
-                          ? 'bg-teal-100/80 dark:bg-teal-950/60 border-teal-500/50 text-teal-900 dark:text-teal-300 shadow-sm'
-                          : 'bg-slate-50/70 dark:bg-slate-850/50 border-slate-200/80 dark:border-white/[0.04] hover:border-slate-300 dark:hover:border-white/[0.08] text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          ? 'bg-teal-50 dark:bg-teal-950/60 border-teal-500/60 dark:border-teal-500/50 text-teal-800 dark:text-teal-300 shadow-sm'
+                          : 'bg-slate-100/90 dark:bg-slate-800/70 border-slate-200/90 dark:border-white/[0.06] hover:bg-slate-200/80 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 truncate mr-1">
