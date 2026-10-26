@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation, Compass, Layers, ShieldCheck, ZoomIn, RotateCcw, Search, X } from 'lucide-react';
+import InfoTooltip from './InfoTooltip';
 
 // Default center of the Philippine archipelago
 const PHILIPPINES_CENTER = [12.8797, 121.7740];
@@ -218,19 +219,12 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-5 border-b border-slate-800">
-        <div>
-          <div className="flex items-center gap-2">
-            <Compass className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-xl font-bold tracking-tight text-white">
-              Philippine Air Quality Map
-            </h2>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
-              {cities.length} Stations Active
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Geospatial atmospheric radar beacons across Luzon, Visayas, and Mindanao.
-          </p>
+        <div className="flex items-center gap-2">
+          <Compass className="w-5 h-5 text-cyan-400" />
+          <h2 className="text-xl font-bold tracking-tight text-white flex items-center">
+            Philippine Air Quality Map
+            <InfoTooltip text="Geospatial atmospheric radar beacons across Luzon, Visayas, and Mindanao." />
+          </h2>
         </div>
 
         {/* Map View Controls */}

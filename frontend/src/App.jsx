@@ -4,6 +4,7 @@ import AQICard from './components/AQICard';
 import HistoryChart from './components/HistoryChart';
 import AQIScaleReference from './components/AQIScaleReference';
 import PhilippineMap, { CITY_REGION_MAP } from './components/PhilippineMap';
+import InfoTooltip from './components/InfoTooltip';
 import { getLiveMetrics, getHistoryMetrics, CITY_FALLBACK_BASELINES } from './api/client';
 
 import { 
@@ -31,9 +32,11 @@ export default function App() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // State: Historical Analytics
+  // State: Historical Analytics with Dual-City Comparison
   const [selectedCity, setSelectedCity] = useState('Manila');
+  const [compareCity, setCompareCity] = useState('Quezon City');
   const [historyData, setHistoryData] = useState([]);
+  const [compareHistoryData, setCompareHistoryData] = useState([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -59,24 +62,25 @@ export default function App() {
   }, []);
 
   /**
-   * Fetch historical time series for the active city from GET /api/history
+   * Fetch historical time series for active city (and optional comparison city) from GET /api/history
    */
   const fetchHistory = useCallback(async () => {
     setIsHistoryLoading(true);
     try {
-      const result = await getHistoryMetrics({
-        city: selectedCity,
-        startDate,
-        endDate,
-        limit
-      });
-      setHistoryData(result.data);
+      const [res1, res2] = await Promise.all([
+        getHistoryMetrics({ city: selectedCity, startDate, endDate, limit }),
+        compareCity && compareCity !== 'none' && compareCity.toLowerCase() !== selectedCity.toLowerCase()
+          ? getHistoryMetrics({ city: compareCity, startDate, endDate, limit })
+          : Promise.resolve({ data: [] })
+      ]);
+      setHistoryData(res1.data || []);
+      setCompareHistoryData(res2.data || []);
     } catch (err) {
       console.error('Error fetching history:', err);
     } finally {
       setIsHistoryLoading(false);
     }
-  }, [selectedCity, startDate, endDate, limit]);
+  }, [selectedCity, compareCity, startDate, endDate, limit]);
 
   // Initial load and 15-second polling loop
   useEffect(() => {
@@ -88,7 +92,7 @@ export default function App() {
     return () => clearInterval(interval);
   }, [fetchLive]);
 
-  // Sync historical chart whenever the active city or parameters change
+  // Sync historical chart whenever the active city, compare city, or parameters change
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
@@ -114,16 +118,11 @@ export default function App() {
             <div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-cyan-400" />
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center">
                   Real-Time Philippine City Telemetry
+                  <InfoTooltip text="Real-time atmospheric monitoring across major urban centers. Click any card to visualize its historical trend." />
                 </h2>
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
-                  {liveCities.length} Cities Active
-                </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Real-time atmospheric monitoring across major urban centers. Click any card to visualize its historical trend.
-              </p>
             </div>
 
             {/* Interactive Sorting Dropdown */}
@@ -271,8 +270,11 @@ export default function App() {
         <section>
           <HistoryChart
             historyData={historyData}
+            compareHistoryData={compareHistoryData}
             selectedCity={selectedCity}
+            compareCity={compareCity}
             onCityChange={setSelectedCity}
+            onCompareCityChange={setCompareCity}
             isLoading={isHistoryLoading}
             onRefreshHistory={fetchHistory}
             startDate={startDate}

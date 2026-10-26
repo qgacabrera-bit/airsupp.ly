@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -18,9 +18,12 @@ import {
   Calendar,
   Filter,
   BarChart3,
-  RefreshCw
+  RefreshCw,
+  GitCompare,
+  ArrowRightLeft
 } from 'lucide-react';
 import { exportToPDF, exportToExcel, exportToCSV } from '../utils/exportUtils';
+import InfoTooltip from './InfoTooltip';
 
 const CITIES = [
   // NCR
@@ -33,18 +36,78 @@ const CITIES = [
   'Davao', 'Cagayan de Oro', 'General Santos', 'Zamboanga City', 'Iligan City', 'Butuan City'
 ];
 
-// Custom Glassmorphic Tooltip for Recharts
-function CustomTooltip({ active, payload, label }) {
+// Custom Comparative Tooltip for Recharts
+function CustomTooltip({ active, payload, label, isComparing, city1, city2 }) {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+
+    if (isComparing) {
+      const aqiDelta = (data.aqi1 != null && data.aqi2 != null) ? data.aqi1 - data.aqi2 : null;
+      return (
+        <div className="glass-panel p-3.5 rounded-xl border border-slate-700/80 shadow-2xl text-xs space-y-2.5 min-w-[240px]">
+          <div className="font-mono text-[11px] text-slate-400 border-b border-slate-800 pb-1 flex items-center justify-between">
+            <span>{label}</span>
+            <span className="text-cyan-400 font-bold uppercase tracking-wider text-[9px] bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800/60">
+              Comparative Telemetry
+            </span>
+          </div>
+
+          {/* City 1 Metrics */}
+          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-cyan-500/30 space-y-1">
+            <div className="flex items-center justify-between font-bold">
+              <span className="text-cyan-300 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                {data.city1 || city1}
+              </span>
+              <span style={{ color: data.color1 || '#38BDF8' }} className="font-mono">
+                AQI {data.aqi1 ?? 'N/A'} {data.category1 ? `(${data.category1})` : ''}
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>PM2.5: <strong className="text-cyan-300 font-mono">{data.pm251 ?? 'N/A'} µg/m³</strong></span>
+              <span>{data.temp1 != null ? `${data.temp1}°C` : ''} {data.hum1 != null ? `| ${data.hum1}%` : ''}</span>
+            </div>
+          </div>
+
+          {/* City 2 Metrics */}
+          <div className="bg-slate-950/70 p-2.5 rounded-lg border border-amber-500/30 space-y-1">
+            <div className="flex items-center justify-between font-bold">
+              <span className="text-amber-400 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                {data.city2 || city2}
+              </span>
+              <span style={{ color: data.color2 || '#F59E0B' }} className="font-mono">
+                AQI {data.aqi2 ?? 'N/A'} {data.category2 ? `(${data.category2})` : ''}
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-400 flex items-center justify-between">
+              <span>PM2.5: <strong className="text-amber-300 font-mono">{data.pm252 ?? 'N/A'} µg/m³</strong></span>
+              <span>{data.temp2 != null ? `${data.temp2}°C` : ''} {data.hum2 != null ? `| ${data.hum2}%` : ''}</span>
+            </div>
+          </div>
+
+          {/* Difference Summary */}
+          {aqiDelta != null && (
+            <div className="text-[11px] pt-1.5 border-t border-slate-800 text-slate-300 flex items-center justify-between font-mono">
+              <span>AQI Delta:</span>
+              <span className={aqiDelta > 0 ? 'text-amber-400 font-bold' : aqiDelta < 0 ? 'text-cyan-400 font-bold' : 'text-slate-400'}>
+                {Math.abs(aqiDelta)} pts ({aqiDelta > 0 ? `${city1} +${aqiDelta}` : aqiDelta < 0 ? `${city2} +${Math.abs(aqiDelta)}` : 'Equal'})
+              </span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Single City Tooltip
     return (
-      <div className="glass-panel p-3.5 rounded-xl border border-slate-700/80 shadow-2xl text-xs space-y-1.5 min-w-[180px]">
+      <div className="glass-panel p-3.5 rounded-xl border border-slate-700/80 shadow-2xl text-xs space-y-1.5 min-w-[190px]">
         <div className="font-mono text-[11px] text-slate-400 border-b border-slate-800 pb-1">
           {label}
         </div>
         <div className="flex items-center justify-between gap-3">
           <span className="text-slate-300 font-medium">City:</span>
-          <span className="font-bold text-white">{data.city}</span>
+          <span className="font-bold text-white">{data.city || city1}</span>
         </div>
         <div className="flex items-center justify-between gap-3">
           <span className="text-slate-300 font-medium">AQI Score:</span>
@@ -52,17 +115,19 @@ function CustomTooltip({ active, payload, label }) {
             style={{ color: data.color_hex || '#00E400' }}
             className="font-bold text-sm"
           >
-            {data.aqi} ({data.category})
+            {data.aqi} {data.category ? `(${data.category})` : ''}
           </span>
         </div>
         <div className="flex items-center justify-between gap-3">
           <span className="text-slate-300 font-medium">PM2.5:</span>
           <span className="font-mono font-semibold text-cyan-400">{data.pm25} µg/m³</span>
         </div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-slate-300 font-medium">PM10:</span>
-          <span className="font-mono text-slate-300">{data.pm10} µg/m³</span>
-        </div>
+        {data.pm10 != null && (
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-slate-300 font-medium">PM10:</span>
+            <span className="font-mono text-slate-300">{data.pm10} µg/m³</span>
+          </div>
+        )}
         <div className="flex items-center justify-between gap-3 pt-1 border-t border-slate-800 text-[10px] text-slate-400">
           <span>Temp / Hum:</span>
           <span>{data.temperature}°C | {data.humidity}%</span>
@@ -74,21 +139,71 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 export default function HistoryChart({
-  historyData,
-  selectedCity,
+  historyData = [],
+  compareHistoryData = [],
+  selectedCity = 'Manila',
+  compareCity = 'Quezon City',
   onCityChange,
-  isLoading,
+  onCompareCityChange,
+  isLoading = false,
   onRefreshHistory,
-  startDate,
-  endDate,
+  startDate = '',
+  endDate = '',
   onStartDateChange,
   onEndDateChange,
-  limit,
+  limit = 50,
   onLimitChange
 }) {
   const [activeMetric, setActiveMetric] = useState('both'); // 'both', 'aqi', 'pm25'
 
-  // Format timestamp for X-Axis tick (shows HH:mm:ss in Philippine time or UTC)
+  const isComparing = Boolean(compareCity && compareCity !== 'none' && compareCity.toLowerCase() !== selectedCity.toLowerCase());
+
+  // Merge City 1 and City 2 time series into aligned comparison dataset
+  const chartData = useMemo(() => {
+    if (!isComparing) {
+      return historyData.map((d) => ({
+        ...d,
+        aqi1: d.aqi,
+        pm251: d.pm25,
+        temp1: d.temperature,
+        hum1: d.humidity,
+        city1: d.city || selectedCity
+      }));
+    }
+
+    const maxLen = Math.max(historyData.length, compareHistoryData.length);
+    const merged = [];
+
+    for (let i = 0; i < maxLen; i++) {
+      const p1 = historyData[i] || {};
+      const p2 = compareHistoryData[i] || {};
+      const timeLabel = p1.window_start || p2.window_start || new Date().toISOString();
+
+      merged.push({
+        window_start: timeLabel,
+        // City 1 values
+        city1: selectedCity,
+        aqi1: p1.aqi,
+        pm251: p1.pm25,
+        temp1: p1.temperature,
+        hum1: p1.humidity,
+        category1: p1.category,
+        color1: p1.color_hex || '#38BDF8',
+        // City 2 values
+        city2: compareCity,
+        aqi2: p2.aqi,
+        pm252: p2.pm25,
+        temp2: p2.temperature,
+        hum2: p2.humidity,
+        category2: p2.category,
+        color2: p2.color_hex || '#F59E0B'
+      });
+    }
+
+    return merged;
+  }, [historyData, compareHistoryData, selectedCity, compareCity, isComparing]);
+
+  // Format timestamp for X-Axis tick
   const formatXAxis = (tickItem) => {
     if (!tickItem) return '';
     try {
@@ -102,16 +217,32 @@ export default function HistoryChart({
     }
   };
 
+  // Swap primary and comparison cities
+  const handleSwapCities = () => {
+    if (isComparing) {
+      const prevCity = selectedCity;
+      onCityChange(compareCity);
+      onCompareCityChange(prevCity);
+    }
+  };
+
+  // Export handlers
   const handleExportPDF = () => {
-    exportToPDF(historyData, { city: selectedCity, startDate, endDate });
+    const exportData = isComparing ? [...historyData, ...compareHistoryData] : historyData;
+    const exportLabel = isComparing ? `${selectedCity} vs ${compareCity}` : selectedCity;
+    exportToPDF(exportData, { city: exportLabel, startDate, endDate });
   };
 
   const handleExportExcel = () => {
-    exportToExcel(historyData, { city: selectedCity });
+    const exportData = isComparing ? [...historyData, ...compareHistoryData] : historyData;
+    const exportLabel = isComparing ? `${selectedCity} vs ${compareCity}` : selectedCity;
+    exportToExcel(exportData, { city: exportLabel });
   };
 
   const handleExportCSV = () => {
-    exportToCSV(historyData, { city: selectedCity });
+    const exportData = isComparing ? [...historyData, ...compareHistoryData] : historyData;
+    const exportLabel = isComparing ? `${selectedCity} vs ${compareCity}` : selectedCity;
+    exportToCSV(exportData, { city: exportLabel });
   };
 
   return (
@@ -121,13 +252,11 @@ export default function HistoryChart({
         <div>
           <div className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-xl font-bold text-white tracking-tight">
-              Historical Windowed Telemetry & Trends
+            <h2 className="text-xl font-bold text-white tracking-tight flex items-center">
+              Historical Telemetry & Comparative Analytics
+              <InfoTooltip text="Aggregated over 15-second tumbling windows with 30-second watermarking via Apache Spark." />
             </h2>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Aggregated over 15-second tumbling windows with 30-second watermarking via Apache Spark.
-          </p>
         </div>
 
         {/* 3 Prominent Action Export Buttons */}
@@ -158,13 +287,13 @@ export default function HistoryChart({
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
-        {/* City Filter */}
-        <div>
-          <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1">
-            <Filter className="w-3 h-3 text-cyan-400" />
-            <span>City Focus</span>
+      {/* Filter Bar with Dual-City Comparison Controls */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 mb-6 bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 items-end">
+        {/* City 1 (Primary) */}
+        <div className="lg:col-span-3">
+          <label className="block text-[11px] font-semibold text-cyan-400 mb-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+            <span>City 1 (Primary)</span>
           </label>
           <select
             value={selectedCity}
@@ -179,119 +308,131 @@ export default function HistoryChart({
           </select>
         </div>
 
-        {/* Start Date-Time */}
-        <div>
-          <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-cyan-400" />
-            <span>Start Date (UTC)</span>
-          </label>
-          <input
-            type="text"
-            placeholder="YYYY-MM-DD or ISO"
-            value={startDate}
-            onChange={(e) => onStartDateChange(e.target.value)}
-            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:ring-1 focus:ring-cyan-400 focus:outline-none"
-          />
+        {/* City Swap Button */}
+        <div className="hidden lg:flex lg:col-span-1 items-center justify-center pb-1">
+          <button
+            type="button"
+            onClick={handleSwapCities}
+            disabled={!isComparing}
+            title="Swap cities"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-cyan-300 border border-slate-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <ArrowRightLeft className="w-3.5 h-3.5" />
+          </button>
         </div>
 
-        {/* End Date-Time */}
-        <div>
-          <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-cyan-400" />
-            <span>End Date (UTC)</span>
+        {/* City 2 (Compare Target) */}
+        <div className="lg:col-span-3">
+          <label className="block text-[11px] font-semibold text-amber-400 mb-1 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>City 2 (Comparison)</span>
           </label>
-          <input
-            type="text"
-            placeholder="YYYY-MM-DD or ISO"
-            value={endDate}
-            onChange={(e) => onEndDateChange(e.target.value)}
-            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-mono focus:ring-1 focus:ring-cyan-400 focus:outline-none"
-          />
+          <select
+            value={compareCity}
+            onChange={(e) => onCompareCityChange(e.target.value)}
+            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-amber-400 focus:outline-none"
+          >
+            <option value="none">-- None (Single City View) --</option>
+            {CITIES.map((c) => (
+              <option key={c} value={c} disabled={c.toLowerCase() === selectedCity.toLowerCase()}>
+                {c} {c.toLowerCase() === selectedCity.toLowerCase() ? '(Active)' : ''}
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* Limit & Filter Action */}
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-              Data Limit
-            </label>
-            <select
-              value={limit}
-              onChange={(e) => onLimitChange(Number(e.target.value))}
-              className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-cyan-400 focus:outline-none"
-            >
-              <option value={20}>20 points</option>
-              <option value={50}>50 points</option>
-              <option value={100}>100 points</option>
-              <option value={250}>250 points</option>
-            </select>
-          </div>
+        {/* Data Limit */}
+        <div className="lg:col-span-2">
+          <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+            Data Limit
+          </label>
+          <select
+            value={limit}
+            onChange={(e) => onLimitChange(Number(e.target.value))}
+            className="w-full bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-cyan-400 focus:outline-none"
+          >
+            <option value={20}>20 points</option>
+            <option value={50}>50 points</option>
+            <option value={100}>100 points</option>
+            <option value={250}>250 points</option>
+          </select>
+        </div>
 
+        {/* Apply Refresh Button */}
+        <div className="lg:col-span-3 flex items-center gap-2">
           <button
             onClick={onRefreshHistory}
             disabled={isLoading}
-            className="px-3.5 py-1.5 h-[34px] rounded-lg bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-xs font-semibold text-white flex items-center gap-1 transition"
+            className="w-full px-3.5 py-1.5 h-[34px] rounded-lg bg-cyan-600 hover:bg-cyan-500 active:scale-95 text-xs font-semibold text-white flex items-center justify-center gap-1.5 transition shadow-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Apply</span>
+            <span>Apply Filter</span>
           </button>
         </div>
       </div>
 
       {/* Chart Metric Toggle */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-semibold">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs font-semibold overflow-x-auto">
           <button
             onClick={() => setActiveMetric('both')}
-            className={`px-3 py-1 rounded-md transition ${
+            className={`px-3 py-1 rounded-md transition whitespace-nowrap ${
               activeMetric === 'both' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
             }`}
           >
-            AQI & PM2.5 Combined
+            {isComparing ? 'AQI & PM2.5 Both Cities' : 'AQI & PM2.5 Combined'}
           </button>
           <button
             onClick={() => setActiveMetric('aqi')}
-            className={`px-3 py-1 rounded-md transition ${
+            className={`px-3 py-1 rounded-md transition whitespace-nowrap ${
               activeMetric === 'aqi' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
             }`}
           >
-            AQI Index Only
+            {isComparing ? 'AQI Comparison Only' : 'AQI Index Only'}
           </button>
           <button
             onClick={() => setActiveMetric('pm25')}
-            className={`px-3 py-1 rounded-md transition ${
+            className={`px-3 py-1 rounded-md transition whitespace-nowrap ${
               activeMetric === 'pm25' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'
             }`}
           >
-            PM2.5 Only (µg/m³)
+            {isComparing ? 'PM2.5 Comparison Only' : 'PM2.5 Only (µg/m³)'}
           </button>
         </div>
 
-        <span className="text-xs text-slate-400 font-mono">
-          Showing {historyData.length} timeline points
-        </span>
+        <div className="flex items-center gap-2 text-xs font-mono">
+          {isComparing && (
+            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-semibold">
+              <GitCompare className="w-3 h-3" />
+              <span>Comparing: {selectedCity} vs {compareCity}</span>
+            </span>
+          )}
+          <span className="text-slate-400">
+            {chartData.length} points
+          </span>
+        </div>
       </div>
 
       {/* Recharts ResponsiveContainer */}
-      <div className="w-full h-[360px] sm:h-[420px]">
-        {historyData.length === 0 ? (
+      <div className="w-full h-[360px] sm:h-[430px]">
+        {chartData.length === 0 ? (
           <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 border border-dashed border-slate-800 rounded-xl">
             <BarChart3 className="w-8 h-8 text-slate-600 mb-2" />
             <p className="text-sm">No historical telemetry points available for this range.</p>
             <span className="text-xs text-slate-500 mt-1">
-              Ensure Spark Structured Streaming is sinking to MongoDB collection `history_logs`.
+              Live background sync is active. Click Apply to refresh latest records.
             </span>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={historyData} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 15, left: -10, bottom: 0 }}>
               <defs>
                 <linearGradient id="aqiGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.35} />
                   <stop offset="95%" stopColor="#38BDF8" stopOpacity={0.0} />
                 </linearGradient>
-                <linearGradient id="pm25Gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
+                <linearGradient id="compareAqiGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.25} />
                   <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
@@ -314,7 +455,7 @@ export default function HistoryChart({
                 tickLine={false}
               />
 
-              {activeMetric === 'both' && (
+              {!isComparing && activeMetric === 'both' && (
                 <YAxis
                   yAxisId="right"
                   orientation="right"
@@ -325,7 +466,7 @@ export default function HistoryChart({
                 />
               )}
 
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip isComparing={isComparing} city1={selectedCity} city2={compareCity} />} />
               <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: '12px' }} />
 
               {/* Standard EPA Reference Breakpoints */}
@@ -351,30 +492,94 @@ export default function HistoryChart({
                 label={{ value: 'Sensitive (150)', fill: '#FF7E00', fontSize: 10, position: 'right' }}
               />
 
-              {(activeMetric === 'both' || activeMetric === 'aqi') && (
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="aqi"
-                  name="AQI Score"
-                  stroke="#38BDF8"
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#aqiGradient)"
-                />
-              )}
+              {/* Comparative Dual-City Curves */}
+              {isComparing ? (
+                <>
+                  {/* City 1 AQI */}
+                  {(activeMetric === 'both' || activeMetric === 'aqi') && (
+                    <Area
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="aqi1"
+                      name={`AQI (${selectedCity})`}
+                      stroke="#38BDF8"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill="url(#aqiGradient)"
+                    />
+                  )}
 
-              {(activeMetric === 'both' || activeMetric === 'pm25') && (
-                <Line
-                  yAxisId={activeMetric === 'both' ? 'right' : 'left'}
-                  type="monotone"
-                  dataKey="pm25"
-                  name="PM2.5 (µg/m³)"
-                  stroke="#F59E0B"
-                  strokeWidth={2}
-                  dot={{ r: 2.5, fill: '#F59E0B' }}
-                  activeDot={{ r: 5 }}
-                />
+                  {/* City 2 AQI */}
+                  {(activeMetric === 'both' || activeMetric === 'aqi') && (
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="aqi2"
+                      name={`AQI (${compareCity})`}
+                      stroke="#F59E0B"
+                      strokeWidth={2.5}
+                      dot={{ r: 2.5, fill: '#F59E0B' }}
+                      activeDot={{ r: 5 }}
+                    />
+                  )}
+
+                  {/* City 1 PM2.5 */}
+                  {(activeMetric === 'both' || activeMetric === 'pm25') && (
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="pm251"
+                      name={`PM2.5 (${selectedCity})`}
+                      stroke="#2DD4BF"
+                      strokeWidth={1.8}
+                      strokeDasharray="4 4"
+                      dot={{ r: 2, fill: '#2DD4BF' }}
+                    />
+                  )}
+
+                  {/* City 2 PM2.5 */}
+                  {(activeMetric === 'both' || activeMetric === 'pm25') && (
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="pm252"
+                      name={`PM2.5 (${compareCity})`}
+                      stroke="#FB7185"
+                      strokeWidth={1.8}
+                      strokeDasharray="4 4"
+                      dot={{ r: 2, fill: '#FB7185' }}
+                    />
+                  )}
+                </>
+              ) : (
+                /* Single City Classic Curves */
+                <>
+                  {(activeMetric === 'both' || activeMetric === 'aqi') && (
+                    <Area
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="aqi"
+                      name="AQI Score"
+                      stroke="#38BDF8"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill="url(#aqiGradient)"
+                    />
+                  )}
+
+                  {(activeMetric === 'both' || activeMetric === 'pm25') && (
+                    <Line
+                      yAxisId={activeMetric === 'both' ? 'right' : 'left'}
+                      type="monotone"
+                      dataKey="pm25"
+                      name="PM2.5 (µg/m³)"
+                      stroke="#F59E0B"
+                      strokeWidth={2}
+                      dot={{ r: 2.5, fill: '#F59E0B' }}
+                      activeDot={{ r: 5 }}
+                    />
+                  )}
+                </>
               )}
             </ComposedChart>
           </ResponsiveContainer>

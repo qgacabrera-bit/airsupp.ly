@@ -1,4 +1,5 @@
 import React from 'react';
+import InfoTooltip from './InfoTooltip';
 
 const AQI_LEVELS = [
   { range: '0 - 50', label: 'Good', color: '#00E400', desc: 'Satisfactory, safe for all outdoor activities' },
@@ -12,11 +13,11 @@ const AQI_LEVELS = [
 export default function AQIScaleReference() {
   return (
     <div className="glass-panel rounded-2xl p-4 sm:p-5 mb-8">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
-        <h3 className="text-xs uppercase font-bold tracking-wider text-slate-400">
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <h3 className="text-xs uppercase font-bold tracking-wider text-slate-400 flex items-center">
           Philippine DENR / US EPA Air Quality Index Reference Scale
+          <InfoTooltip text="PM2.5 Breakpoint Standard categorized according to Philippine DENR and US EPA environmental health guidelines." />
         </h3>
-        <span className="text-[11px] text-slate-500">PM2.5 Breakpoint Standard</span>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
