@@ -64,7 +64,12 @@ export const CITY_REGION_MAP = {
 
 const REGIONS = ['All', 'NCR', 'Luzon', 'Visayas', 'Mindanao'];
 
-export default function PhilippineMap({ cities = [], selectedCity = 'Manila', onCitySelect }) {
+export default function PhilippineMap({ 
+  cities = [], 
+  selectedCity = 'Manila', 
+  selectionTimestamp = 0,
+  onCitySelect 
+}) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
@@ -182,26 +187,37 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
         popupAnchor: [0, -((pinSize + 14) / 2)]
       });
 
-      // Interactive Popup Content
+      // Interactive Popup Content: Detailed stats displayed directly on the map
       const popupContent = `
-        <div style="font-family: sans-serif; min-width: 190px; color: #f8fafc; padding: 2px;">
+        <div style="font-family: system-ui, -apple-system, sans-serif; min-width: 210px; color: #f8fafc; padding: 2px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 8px;">
-            <strong style="font-size: 13px; color: #ffffff;">${item.city}</strong>
-            <span style="background-color: ${markerColor}25; color: ${aqiDisplayColor}; border: 1px solid ${markerColor}80; padding: 1px 7px; border-radius: 9999px; font-size: 9px; font-weight: bold; text-transform: uppercase;">
+            <div>
+              <strong style="font-size: 13px; color: #ffffff; display: block;">${item.city}</strong>
+              <span style="font-size: 10px; color: #94a3b8; font-family: monospace;">Station: ${item.sensor_id}</span>
+            </div>
+            <span style="background-color: ${markerColor}25; color: ${aqiDisplayColor}; border: 1px solid ${markerColor}80; padding: 2px 7px; border-radius: 9999px; font-size: 9px; font-weight: bold; text-transform: uppercase;">
               ${item.category}
             </span>
           </div>
-          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px;">
-            <span style="font-size: 26px; font-weight: 900; color: ${aqiDisplayColor}; line-height: 1;">${item.aqi}</span>
+          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px;">
+            <span style="font-size: 28px; font-weight: 900; color: ${aqiDisplayColor}; line-height: 1;">${item.aqi}</span>
             <span style="font-size: 10px; color: #94a3b8;">AQI / 300 scale</span>
           </div>
-          <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 4px;">
-            PM2.5: <strong style="color: #38bdf8;">${Number(item.pm25).toFixed(1)} µg/m³</strong> | PM10: <strong>${Number(item.pm10).toFixed(1)} µg/m³</strong>
+          <div style="background: rgba(15, 23, 42, 0.65); padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 6px; font-family: monospace; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+              <span style="color: #cbd5e1;">PM2.5:</span>
+              <strong style="color: #38bdf8;">${Number(item.pm25).toFixed(1)} µg/m³</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+              <span style="color: #cbd5e1;">PM10:</span>
+              <strong style="color: #f1f5f9;">${Number(item.pm10).toFixed(1)} µg/m³</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; color: #94a3b8; font-size: 10px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 3px;">
+              <span>Temp: <strong style="color: #e2e8f0;">${Number(item.temperature).toFixed(1)}°C</strong></span>
+              <span>Hum: <strong style="color: #e2e8f0;">${Number(item.humidity).toFixed(1)}%</strong></span>
+            </div>
           </div>
-          <div style="font-size: 10px; color: #94a3b8; margin-bottom: 6px;">
-            Temp: ${Number(item.temperature).toFixed(1)}°C | Humidity: ${Number(item.humidity).toFixed(1)}%
-          </div>
-          <div style="background: rgba(2, 6, 23, 0.6); padding: 6px; border-radius: 6px; font-size: 10px; color: #e2e8f0; line-height: 1.35; border: 1px solid #1e293b;">
+          <div style="background: rgba(2, 6, 23, 0.75); padding: 6px 8px; border-radius: 6px; font-size: 10px; color: #e2e8f0; line-height: 1.35; border: 1px solid #1e293b;">
             ${item.health_advisory}
           </div>
         </div>
@@ -242,6 +258,11 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
         });
         marker.on('click', () => {
           onCitySelect(item.city);
+          if (mapInstanceRef.current) {
+            mapInstanceRef.current.flyTo([item.latitude, item.longitude], 11, {
+              duration: 1.0
+            });
+          }
         });
         if (isSelected) marker.setZIndexOffset(1000);
 
@@ -251,7 +272,30 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
     });
   }, [cities, selectedCity, onCitySelect]);
 
-  // Smoothly fly to city when selected
+  // Whenever user selects a city from cards, map marker, or side panel,
+  // automatically flyTo/center on that area and show the stats popup directly on the map
+  useEffect(() => {
+    if (!mapInstanceRef.current || !selectedCity || cities.length === 0) return;
+
+    // Find coordinate details for the selected station
+    const target = cities.find((c) => c.city.toLowerCase() === selectedCity.toLowerCase());
+    if (target && target.latitude && target.longitude) {
+      mapInstanceRef.current.flyTo([target.latitude, target.longitude], 11, {
+        duration: 1.2
+      });
+
+      const timer = setTimeout(() => {
+        const marker = markersMapRef.current.get(target.city);
+        if (marker && mapInstanceRef.current) {
+          marker.openPopup();
+        }
+      }, 350);
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedCity, selectionTimestamp, cities]);
+
+  // Smoothly fly to city when selected from quick switcher
   const flyToCity = (cityName) => {
     onCitySelect(cityName);
     const target = cities.find((c) => c.city.toLowerCase() === cityName.toLowerCase());
@@ -259,12 +303,19 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
       mapInstanceRef.current.flyTo([target.latitude, target.longitude], 11, {
         duration: 1.2
       });
+      setTimeout(() => {
+        const marker = markersMapRef.current.get(target.city);
+        if (marker && mapInstanceRef.current) {
+          marker.openPopup();
+        }
+      }, 350);
     }
   };
 
   // Reset map view to entire country
   const resetMap = () => {
     if (mapInstanceRef.current) {
+      mapInstanceRef.current.closePopup();
       mapInstanceRef.current.flyTo(PHILIPPINES_CENTER, DEFAULT_ZOOM, {
         duration: 1.2
       });

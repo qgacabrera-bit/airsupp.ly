@@ -1,22 +1,15 @@
-You are a Principal Frontend UI/UX Designer and Frontend Engineer. We are upgrading the React PWA dashboard for **AirSupp.ly** (Tagline: *"All Out of Smog"*), our real-time Philippine air quality platform. 
+You are a Principal Frontend UI/UX Engineer and Full-Stack Developer. We are updating the **Historical Telemetry & Comparative Analytics** view for **AirSupp.ly**. 
 
-Refactor the CSS and Tailwind styling to remove the generic "AI-generated dashboard" look (harsh pitch-black backgrounds, neon-saturated primary borders, and flashing toxic status colors) and replace it with a refined, organic, professional SaaS design system. Implement the following adjustments:
+Please implement the following functional and terminology updates to the historical filter and chart controls:
 
-### 1. Warm Slate & Atmospheric Backgrounds
-- Replace pure black (`#000000` or `#0a0e17`) with a deep, organic **Warm Slate / Midnight Navy** background base (e.g., `#0b1329` or Tailwind's `slate-950` layered with a subtle radial gradient vignette to mimic soft studio lighting).
+### 1. Rename "Data Limit" to "Time Scope" or "View Interval"
+- Rename the label and selector currently called "Data Limit" (which shows options like "50 points") to something more intuitive for everyday users, such as **"View Interval"** or **"Time Window"**.
 
-### 2. Desaturated Status Tints & Muted Badges
-- Instead of blazing neon status pills (pure red/green/orange), use **desaturated surface tints** with soft matching text.
-- *Example:* For "Unhealthy / Warning" states, use a deep burnt-amber surface tint (`bg-amber-950/30`), a refined subtle border (`border-amber-800/40`), and soft muted text (`text-amber-300`). 
-- Let color act as a sophisticated semantic accent rather than a flashing wall of neon.
+### 2. Add Aggregation View Toggles (Daily, Weekly, Monthly)
+Replace or expand the fixed data-point selector with an intuitive timeframe mode selector that adjusts how the backend data is grouped and averaged:
+- **Daily View:** Shows hourly averages (e.g., aggregating 15-second streams into hourly data points for the selected day).
+- **Weekly View:** Shows daily averages (aggregating the week's data into 7 daily points).
+- **Monthly View:** Shows daily averages across the entire selected month.
 
-### 3. Layered Shadows Over Hard 1px Borders
-- Eliminate uniform, harsh 1px bright borders (`border-slate-800`) on every single card.
-- Rely on depth and shadow layering: Give cards an almost invisible, ultra-subtle border (`border-white/[0.06]`) paired with soft, diffused drop shadows (`shadow-[0_8px_30px_rgb(0,0,0,0.25)]`).
-- For active or selected cards, use a multi-layered ambient glow instead of a harsh solid outline.
-
-### 4. Introduce a Signature Editorial Accent
-- Move away from standard default blue chrome for the UI. Introduce a signature brand anchor like a sophisticated **soft teal** (`#2dd4bf`) or **muted sage** for your primary interactive elements, loading indicators, and branding accents to give it distinct art direction.
-
-### 5. Harmonized Recharts & Data Visualizations
-- Update all Recharts lines and area fills to use curated, restrained gradients (e.g., a smooth transition from a muted cyan to a warm amber with low fill opacity like `fillOpacity={0.12}`) so charts blend organically into the card surface rather than sitting on top of it like a glaring sticker.
+### 3. Apply the Refined Editorial Color Palette
+- Ensure the chart uses our updated, non-AI aesthetic: a deep warm slate background, organic muted gradient fills (`fillOpacity={0.12}`), and harmonized, desaturated line colors instead of harsh neon primaries.

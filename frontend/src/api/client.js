@@ -724,19 +724,20 @@ export async function getLiveMetrics() {
 
 /**
  * Queries historical time-series data from GET /api/history
- * @param {Object} params - { city, start_date, end_date, limit }
+ * @param {Object} params - { city, start_date, end_date, limit, timeframe }
  * @returns {Promise<{ data: Array, isOffline: boolean, cachedAt: string|null, error: string|null }>}
  */
-export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDate = '', limit = 100 } = {}) {
+export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDate = '', limit = 100, timeframe = 'live' } = {}) {
   const queryParams = new URLSearchParams();
   if (city) queryParams.set('city', city);
   if (startDate) queryParams.set('start_date', startDate);
   if (endDate) queryParams.set('end_date', endDate);
   if (limit) queryParams.set('limit', String(limit));
+  if (timeframe) queryParams.set('timeframe', timeframe);
 
   const baseUrl = getApiBaseUrl();
   const url = `${baseUrl}/api/history?${queryParams.toString()}`;
-  const cacheKey = `airsupply_history_cache_${city || 'ALL'}`;
+  const cacheKey = `airsupply_history_cache_${city || 'ALL'}_${timeframe}`;
 
   try {
     const res = await fetchWithTimeout(url);
@@ -749,7 +750,6 @@ export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDa
     }
     const json = await res.json();
     const data = normalizeData(json);
-
 
     // Cache historical batch
     try {
@@ -786,7 +786,7 @@ export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDa
     }
 
     // Generate synthesized chronological trend for offline demonstration if no history cached yet
-    const mockPoints = generateOfflineHistory(city, limit);
+    const mockPoints = generateOfflineHistory(city, limit, timeframe);
     return {
       data: mockPoints,
       isOffline: true,
@@ -797,18 +797,38 @@ export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDa
 }
 
 /**
- * Synthesizes realistic 15-second chronological data points for offline demo view
+ * Synthesizes realistic chronological data points for offline demo view
  */
-function generateOfflineHistory(city, count = 24) {
+function generateOfflineHistory(city, count = 24, timeframe = 'live') {
   const baseline = CITY_FALLBACK_BASELINES.find(c => c.city.toLowerCase() === city.toLowerCase()) || CITY_FALLBACK_BASELINES[0];
   const points = [];
   const now = Date.now();
 
-  for (let i = count - 1; i >= 0; i--) {
-    const timeOffset = i * 15000;
+  let finalCount = count;
+  let stepMs = 15000;
+
+  if (timeframe === 'daily') {
+    finalCount = 24;
+    stepMs = 3600 * 1000;
+  } else if (timeframe === 'weekly') {
+    finalCount = 7;
+    stepMs = 86400 * 1000;
+  } else if (timeframe === 'monthly') {
+    finalCount = 30;
+    stepMs = 86400 * 1000;
+  }
+
+  for (let i = finalCount - 1; i >= 0; i--) {
+    const timeOffset = i * stepMs;
     const windowStart = new Date(now - timeOffset).toISOString();
-    const windowEnd = new Date(now - timeOffset + 15000).toISOString();
-    const jitter = (Math.sin(i / 3) * 6) + (Math.random() * 2 - 1);
+    const windowEnd = new Date(now - timeOffset + stepMs).toISOString();
+
+    let jitter = (Math.sin(i / 3) * 6) + (Math.random() * 2 - 1);
+    if (timeframe === 'daily') {
+      const hour = new Date(now - timeOffset).getHours();
+      jitter = 6 * Math.sin((hour - 6) * Math.PI / 12) + (Math.random() * 2 - 1);
+    }
+
     const pm25 = Math.max(5, +(baseline.pm25 + jitter).toFixed(1));
     const aqi = Math.max(10, Math.round(baseline.aqi + jitter * 2.2));
 

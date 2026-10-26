@@ -41,7 +41,8 @@ export default function App() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [limit, setLimit] = useState(50);
-
+  const [timeframe, setTimeframe] = useState('live');
+  const [selectionTimestamp, setSelectionTimestamp] = useState(0);
 
   /**
    * Fetch latest live metrics from GET /api/live
@@ -68,9 +69,9 @@ export default function App() {
     setIsHistoryLoading(true);
     try {
       const [res1, res2] = await Promise.all([
-        getHistoryMetrics({ city: selectedCity, startDate, endDate, limit }),
+        getHistoryMetrics({ city: selectedCity, startDate, endDate, limit, timeframe }),
         compareCity && compareCity !== 'none' && compareCity.toLowerCase() !== selectedCity.toLowerCase()
-          ? getHistoryMetrics({ city: compareCity, startDate, endDate, limit })
+          ? getHistoryMetrics({ city: compareCity, startDate, endDate, limit, timeframe })
           : Promise.resolve({ data: [] })
       ]);
       setHistoryData(res1.data || []);
@@ -80,7 +81,7 @@ export default function App() {
     } finally {
       setIsHistoryLoading(false);
     }
-  }, [selectedCity, compareCity, startDate, endDate, limit]);
+  }, [selectedCity, compareCity, startDate, endDate, limit, timeframe]);
 
   // Initial load and 15-second polling loop
   useEffect(() => {
@@ -99,6 +100,7 @@ export default function App() {
 
   const handleCitySelect = (cityName) => {
     setSelectedCity(cityName);
+    setSelectionTimestamp(Date.now());
   };
 
   return (
@@ -258,6 +260,7 @@ export default function App() {
           <PhilippineMap
             cities={liveCities}
             selectedCity={selectedCity}
+            selectionTimestamp={selectionTimestamp}
             onCitySelect={handleCitySelect}
           />
         </section>
@@ -283,6 +286,8 @@ export default function App() {
             onEndDateChange={setEndDate}
             limit={limit}
             onLimitChange={setLimit}
+            timeframe={timeframe}
+            onTimeframeChange={setTimeframe}
           />
         </section>
       </main>

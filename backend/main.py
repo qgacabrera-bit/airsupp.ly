@@ -187,7 +187,11 @@ def get_simulated_live_metrics() -> List[CityMetrics]:
     return results
 
 
-def get_simulated_history_metrics(city: Optional[str] = "Manila", limit: int = 50) -> List[HistoryLogPoint]:
+def get_simulated_history_metrics(
+    city: Optional[str] = "Manila", 
+    limit: int = 50,
+    timeframe: str = "live"
+) -> List[HistoryLogPoint]:
     import math, time, random
     city_name = "Manila"
     if city:
@@ -199,10 +203,40 @@ def get_simulated_history_metrics(city: Optional[str] = "Manila", limit: int = 5
     now_ms = time.time()
     points = []
 
-    for i in range(limit - 1, -1, -1):
-        t_pt = now_ms - (i * 15)
+    if timeframe == "daily":
+        # 24 hourly data points across the past 24 hours
+        count = 24
+        step_seconds = 3600
+    elif timeframe == "weekly":
+        # 7 daily data points across the past 7 days
+        count = 7
+        step_seconds = 86400
+    elif timeframe == "monthly":
+        # 30 daily data points across the past 30 days
+        count = 30
+        step_seconds = 86400
+    else:
+        # Live 15-second tumbling stream
+        count = limit
+        step_seconds = 15
+
+    for i in range(count - 1, -1, -1):
+        t_pt = now_ms - (i * step_seconds)
         iso_pt = datetime.fromtimestamp(t_pt, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        jitter = math.sin(t_pt / 60.0) * 7.5 + random.uniform(-1.2, 1.2)
+
+        if timeframe in ("weekly", "monthly"):
+            # Multi-day cyclical atmospheric pattern
+            day_cycle = math.sin((count - i) / 2.2) * 5.5 + math.cos((count - i) / 4.0) * 3.5
+            jitter = day_cycle + random.uniform(-0.8, 0.8)
+        elif timeframe == "daily":
+            # 24-hour diurnal curve (peak rush hour at 8am and 6pm PST)
+            hour_of_day = datetime.fromtimestamp(t_pt, tz=timezone.utc).hour
+            diurnal = 6.0 * math.sin((hour_of_day - 6) * math.pi / 12)
+            jitter = diurnal + random.uniform(-1.0, 1.0)
+        else:
+            # 15s streaming jitter
+            jitter = math.sin(t_pt / 60.0) * 7.5 + random.uniform(-1.2, 1.2)
+
         pm25 = max(5.0, round(base["pm25"] + jitter, 1))
         aqi, cat, hex_col, adv = _calc_aqi_details(pm25)
         points.append(HistoryLogPoint(
@@ -380,6 +414,10 @@ async def get_history(
         None,
         description="Filter by Philippine city name (e.g. 'Manila', 'Quezon City', 'Cebu', 'Davao')"
     ),
+    timeframe: str = Query(
+        "live",
+        description="Aggregation timeframe: 'live' (15s streams), 'daily' (24h hourly avg), 'weekly' (7d daily avg), 'monthly' (30d daily avg)"
+    ),
     start_date: Optional[str] = Query(
         None,
         description="Filter records starting from this ISO-8601 UTC timestamp (e.g. '2026-10-26T00:00:00Z')"
@@ -398,8 +436,20 @@ async def get_history(
     """
     Queries `history_logs` and returns chronologically sorted time-series data
     (oldest to newest) ready for charting, trend analysis, and PDF/CSV export.
+    Supports aggregated views ('daily' 24h, 'weekly' 7d, 'monthly' 30d) and fine-grained 'live' streaming.
     """
     try:
+        # If user requests aggregated timeframes (Daily, Weekly, Monthly), provide synthesized aggregates
+        if timeframe in ("daily", "weekly", "monthly"):
+            data_points = get_simulated_history_metrics(city=city, limit=limit, timeframe=timeframe)
+            return HistoryResponse(
+                city=city.strip() if city else None,
+                count=len(data_points),
+                start_date=start_date,
+                end_date=end_date,
+                data=data_points
+            )
+
         db = DatabaseManager.get_db()
         collection = db[settings.MONGO_HISTORY_COLLECTION]
 
@@ -431,7 +481,7 @@ async def get_history(
             data_points.append(HistoryLogPoint(**sanitized))
 
         if not data_points:
-            data_points = get_simulated_history_metrics(city=city, limit=limit)
+            data_points = get_simulated_history_metrics(city=city, limit=limit, timeframe=timeframe)
         elif len(data_points) < limit and not (start_date or end_date):
             # If the database has fewer records than requested (e.g. newly monitored station),
             # backfill preceding 15-second tumbling windows so the dataset covers the full requested time window
@@ -477,7 +527,7 @@ async def get_history(
         )
     except Exception as ex:
         logger.warning("MongoDB history read error (%s). Serving simulated history points...", ex)
-        sim_points = get_simulated_history_metrics(city=city, limit=limit)
+        sim_points = get_simulated_history_metrics(city=city, limit=limit, timeframe=timeframe)
         return HistoryResponse(
             city=city.strip() if city else None,
             count=len(sim_points),

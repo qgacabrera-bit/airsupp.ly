@@ -152,7 +152,9 @@ export default function HistoryChart({
   onStartDateChange,
   onEndDateChange,
   limit = 50,
-  onLimitChange
+  onLimitChange,
+  timeframe = 'live',
+  onTimeframeChange
 }) {
   const [activeMetric, setActiveMetric] = useState('both'); // 'both', 'aqi', 'pm25'
 
@@ -185,8 +187,10 @@ export default function HistoryChart({
       const first = arr[0];
       const firstTime = first.window_start ? new Date(first.window_start).getTime() : Date.now();
       const prefix = [];
+      const stepMs = timeframe === 'daily' ? 3600000 : timeframe === 'weekly' || timeframe === 'monthly' ? 86400000 : 15000;
+
       for (let i = needed; i > 0; i--) {
-        const timeMs = firstTime - (i * 15000);
+        const timeMs = firstTime - (i * stepMs);
         const iso = new Date(timeMs).toISOString();
         const jitter = Math.sin(timeMs / 60000) * 4 + (Math.random() * 2 - 1);
         const pm25 = Math.max(5, +(first.pm25 + jitter).toFixed(1));
@@ -240,19 +244,32 @@ export default function HistoryChart({
     }
 
     return merged;
-  }, [historyData, compareHistoryData, selectedCity, compareCity, isComparing]);
+  }, [historyData, compareHistoryData, selectedCity, compareCity, isComparing, timeframe]);
 
-  // Format timestamp for X-Axis tick
+  // Format timestamp for X-Axis tick dynamically based on active timeframe
   const formatXAxis = (tickItem) => {
     if (!tickItem) return '';
     try {
-      const parts = tickItem.split('T');
-      if (parts.length > 1) {
-        return parts[1].replace('Z', '').slice(0, 8);
+      const date = new Date(tickItem);
+      if (isNaN(date.getTime())) return tickItem.slice(-8);
+
+      if (timeframe === 'daily') {
+        // e.g. 14:00
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
       }
-      return tickItem.slice(-8);
+      if (timeframe === 'weekly') {
+        // e.g. Mon, Oct 24
+        return date.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+      }
+      if (timeframe === 'monthly') {
+        // e.g. Oct 24
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+
+      // Default Live: hh:mm:ss
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     } catch {
-      return tickItem;
+      return tickItem.slice(-8);
     }
   };
 
@@ -326,6 +343,39 @@ export default function HistoryChart({
         </div>
       </div>
 
+      {/* Timeframe Scope Selector: Live Stream, Daily 24h, Weekly 7d, Monthly 30d */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 p-2.5 bg-slate-900/80 rounded-xl border border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-teal-400 shrink-0 ml-1" />
+          <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center">
+            Aggregation Timeframe
+            <InfoTooltip text="Switch between real-time 15-second streaming buffer, 24-hour diurnal trends, 7-day weekly averages, and full 30-day monthly analytics." />
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:flex items-center gap-1.5 w-full sm:w-auto">
+          {[
+            { id: 'live', label: 'Live Stream (15s)', desc: 'Real-time 15-second continuous streaming telemetry' },
+            { id: 'daily', label: 'Daily View (24h)', desc: 'Hourly averages across 24 hours' },
+            { id: 'weekly', label: 'Weekly View (7d)', desc: 'Daily averages across 7 days' },
+            { id: 'monthly', label: 'Monthly View (30d)', desc: 'Daily averages across 30 days' }
+          ].map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => onTimeframeChange && onTimeframeChange(mode.id)}
+              title={mode.desc}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap active:scale-95 text-center ${
+                timeframe === mode.id
+                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 font-bold shadow-sm'
+                  : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800 border border-white/[0.04]'
+              }`}
+            >
+              {mode.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Filter Bar with Dual-City Comparison Controls */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 mb-6 bg-slate-900/60 p-3.5 rounded-xl border border-white/[0.04] items-end">
         {/* City 1 (Primary) */}
@@ -380,21 +430,27 @@ export default function HistoryChart({
           </select>
         </div>
 
-        {/* Data Limit */}
+        {/* View Interval (Renamed from Data Limit) */}
         <div className="lg:col-span-2">
-          <label className="block text-[11px] font-semibold text-slate-400 mb-1">
-            Data Limit
+          <label className="block text-[11px] font-semibold text-slate-400 mb-1 flex items-center justify-between">
+            <span>View Interval</span>
           </label>
-          <select
-            value={limit}
-            onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="w-full bg-slate-800/90 border border-white/[0.08] text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-teal-400/50 focus:outline-none"
-          >
-            <option value={20}>20 points</option>
-            <option value={50}>50 points</option>
-            <option value={100}>100 points</option>
-            <option value={250}>250 points</option>
-          </select>
+          {timeframe === 'live' ? (
+            <select
+              value={limit}
+              onChange={(e) => onLimitChange(Number(e.target.value))}
+              className="w-full bg-slate-800/90 border border-white/[0.08] text-slate-100 rounded-lg px-3 py-1.5 text-xs font-medium focus:ring-1 focus:ring-teal-400/50 focus:outline-none"
+            >
+              <option value={20}>20 points (~5m)</option>
+              <option value={50}>50 points (~12m)</option>
+              <option value={100}>100 points (~25m)</option>
+              <option value={250}>250 points (~1h)</option>
+            </select>
+          ) : (
+            <div className="w-full bg-slate-800/50 border border-white/[0.06] text-teal-300 rounded-lg px-2.5 py-1.5 text-xs font-semibold flex items-center justify-between">
+              <span>{timeframe === 'daily' ? '24h (Hourly Avg)' : timeframe === 'weekly' ? '7d (Daily Avg)' : '30d (Daily Avg)'}</span>
+            </div>
+          )}
         </div>
 
         {/* Apply Refresh Button */}
@@ -468,7 +524,7 @@ export default function HistoryChart({
               <defs>
                 {/* Refined, low-opacity gradients blending organically into the dark card surface */}
                 <linearGradient id="aqiGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#2DD4BF" stopOpacity={0.14} />
+                  <stop offset="0%" stopColor="#2DD4BF" stopOpacity={0.12} />
                   <stop offset="100%" stopColor="#2DD4BF" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="compareAqiGradient" x1="0" y1="0" x2="0" y2="1">
