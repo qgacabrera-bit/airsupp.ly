@@ -3,7 +3,9 @@ import Navbar from './components/Navbar';
 import AQICard from './components/AQICard';
 import HistoryChart from './components/HistoryChart';
 import AQIScaleReference from './components/AQIScaleReference';
+import PhilippineMap from './components/PhilippineMap';
 import { getLiveMetrics, getHistoryMetrics } from './api/client';
+
 import { MapPin, RefreshCw, AlertCircle, Info, Sparkles } from 'lucide-react';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
@@ -146,10 +148,20 @@ export default function App() {
           </div>
         </section>
 
-        {/* Section 2: Reference AQI Scale (DENR & US EPA Standard) */}
+        {/* Section 2: Interactive Philippine Air Quality Map */}
+        <section>
+          <PhilippineMap
+            cities={liveCities}
+            selectedCity={selectedCity}
+            onCitySelect={handleCitySelect}
+          />
+        </section>
+
+        {/* Section 3: Reference AQI Scale (DENR & US EPA Standard) */}
         <AQIScaleReference />
 
-        {/* Section 3: Interactive Historical Trend & Client-Side Exports */}
+        {/* Section 4: Interactive Historical Trend & Client-Side Exports */}
+
         <section>
           <HistoryChart
             historyData={historyData}
