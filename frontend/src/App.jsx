@@ -3,16 +3,17 @@ import Navbar from './components/Navbar';
 import AQICard from './components/AQICard';
 import HistoryChart from './components/HistoryChart';
 import AQIScaleReference from './components/AQIScaleReference';
-import PhilippineMap from './components/PhilippineMap';
+import PhilippineMap, { CITY_REGION_MAP } from './components/PhilippineMap';
 import { getLiveMetrics, getHistoryMetrics } from './api/client';
 
-import { MapPin, RefreshCw, AlertCircle, Info, Sparkles } from 'lucide-react';
+import { MapPin, RefreshCw, AlertCircle, Info, Sparkles, Filter } from 'lucide-react';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
 export default function App() {
   // State: Live Stream
   const [liveCities, setLiveCities] = useState([]);
+  const [cardRegion, setCardRegion] = useState('All');
   const [isOffline, setIsOffline] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -115,19 +116,21 @@ export default function App() {
 
         {/* Section 1: Real-Time City Telemetry Dashboard */}
         <section>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-cyan-400" />
                 <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                   Real-Time Philippine City Telemetry
                 </h2>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+                  {liveCities.length} Cities Active
+                </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 mt-1">
                 Real-time atmospheric monitoring across major urban centers. Click any card to visualize its historical trend.
               </p>
             </div>
-
 
             <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800 self-start sm:self-auto">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
@@ -135,16 +138,45 @@ export default function App() {
             </div>
           </div>
 
-          {/* Responsive 4-Column Grid for Manila, Quezon City, Cebu, Davao */}
+          {/* Region Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-4 text-xs font-semibold">
+            {['All', 'NCR', 'Luzon', 'Visayas', 'Mindanao'].map((reg) => {
+              const count = reg === 'All' 
+                ? liveCities.length 
+                : liveCities.filter((c) => (c.region || CITY_REGION_MAP[c.city] || '') === reg).length;
+              const isActive = cardRegion === reg;
+              return (
+                <button
+                  key={reg}
+                  onClick={() => setCardRegion(reg)}
+                  className={`px-3 py-1.5 rounded-xl border transition whitespace-nowrap active:scale-95 ${
+                    isActive
+                      ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-bold shadow-md shadow-cyan-900/20'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
+                >
+                  {reg} ({count})
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Responsive Grid of City Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {liveCities.map((metric) => (
-              <AQICard
-                key={metric.city}
-                metric={metric}
-                isSelected={selectedCity.toLowerCase() === metric.city.toLowerCase()}
-                onSelect={handleCitySelect}
-              />
-            ))}
+            {liveCities
+              .filter((metric) => {
+                if (cardRegion === 'All') return true;
+                const reg = metric.region || CITY_REGION_MAP[metric.city] || '';
+                return reg.toLowerCase() === cardRegion.toLowerCase();
+              })
+              .map((metric) => (
+                <AQICard
+                  key={metric.city}
+                  metric={metric}
+                  isSelected={selectedCity.toLowerCase() === metric.city.toLowerCase()}
+                  onSelect={handleCitySelect}
+                />
+              ))}
           </div>
         </section>
 

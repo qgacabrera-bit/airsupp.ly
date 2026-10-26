@@ -1,21 +1,71 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, Navigation, Compass, Layers, ShieldCheck, ZoomIn, RotateCcw } from 'lucide-react';
+import { MapPin, Navigation, Compass, Layers, ShieldCheck, ZoomIn, RotateCcw, Search, X } from 'lucide-react';
 
 // Default center of the Philippine archipelago
 const PHILIPPINES_CENTER = [12.8797, 121.7740];
 const DEFAULT_ZOOM = 6;
+
+// Regional classification lookup for Philippine cities
+export const CITY_REGION_MAP = {
+  'Manila': 'NCR',
+  'Quezon City': 'NCR',
+  'Makati': 'NCR',
+  'Taguig': 'NCR',
+  'Pasig': 'NCR',
+  'Caloocan': 'NCR',
+  'Parañaque': 'NCR',
+  'Muntinlupa': 'NCR',
+  'Marikina': 'NCR',
+  'Baguio City': 'Luzon',
+  'Angeles City': 'Luzon',
+  'San Fernando, Pampanga': 'Luzon',
+  'Antipolo': 'Luzon',
+  'Batangas City': 'Luzon',
+  'Calamba': 'Luzon',
+  'Puerto Princesa': 'Luzon',
+  'Legazpi City': 'Luzon',
+  'Naga City': 'Luzon',
+  'Cebu': 'Visayas',
+  'Mandaue City': 'Visayas',
+  'Iloilo City': 'Visayas',
+  'Bacolod City': 'Visayas',
+  'Tacloban City': 'Visayas',
+  'Tagbilaran City': 'Visayas',
+  'Davao': 'Mindanao',
+  'Cagayan de Oro': 'Mindanao',
+  'General Santos': 'Mindanao',
+  'Zamboanga City': 'Mindanao',
+  'Iligan City': 'Mindanao',
+  'Butuan City': 'Mindanao'
+};
+
+const REGIONS = ['All', 'NCR', 'Luzon', 'Visayas', 'Mindanao'];
 
 export default function PhilippineMap({ cities = [], selectedCity = 'Manila', onCitySelect }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
 
+  const [activeRegion, setActiveRegion] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Active selected city data
   const activeFocus = cities.find(
     (c) => c.city.toLowerCase() === selectedCity.toLowerCase()
   ) || cities[0];
+
+  // Filtered station list for the quick switcher
+  const filteredStations = useMemo(() => {
+    return cities.filter((item) => {
+      const region = item.region || CITY_REGION_MAP[item.city] || 'Other';
+      const matchesRegion = activeRegion === 'All' || region.toLowerCase() === activeRegion.toLowerCase();
+      const matchesSearch = item.city.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
+                            (item.sensor_id && item.sensor_id.toLowerCase().includes(searchQuery.toLowerCase().trim()));
+      return matchesRegion && matchesSearch;
+    });
+  }, [cities, activeRegion, searchQuery]);
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -43,7 +93,6 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
       maxZoom: 16,
       opacity: 0.85
     }).addTo(map);
-
 
     // Zoom control at bottom-right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -141,7 +190,7 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
     onCitySelect(cityName);
     const target = cities.find((c) => c.city.toLowerCase() === cityName.toLowerCase());
     if (target && mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([target.latitude, target.longitude], 10, {
+      mapInstanceRef.current.flyTo([target.latitude, target.longitude], 11, {
         duration: 1.2
       });
     }
@@ -174,9 +223,12 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
             <h2 className="text-xl font-bold tracking-tight text-white">
               Philippine Air Quality Map
             </h2>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+              {cities.length} Stations Active
+            </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Interactive Leaflet geospatial monitoring with real-time sensor radar beacons.
+            Geospatial atmospheric radar beacons across Luzon, Visayas, and Mindanao.
           </p>
         </div>
 
@@ -198,18 +250,9 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
         <div className="lg:col-span-7 relative rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-950">
           <div
             ref={mapContainerRef}
-            className="w-full h-[440px] sm:h-[500px] z-10"
+            className="w-full h-[460px] sm:h-[540px] z-10"
             style={{ background: '#0B1120' }}
           />
-
-          {/* Map Overlay Badge */}
-          <div className="absolute top-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 text-[11px] font-semibold text-slate-300 flex items-center gap-2 shadow-lg">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-            </span>
-            <span>Leaflet Live Tiles</span>
-          </div>
         </div>
 
         {/* Right Column: Active Station Deep Dive & Quick Selector (5 Columns) */}
@@ -218,9 +261,14 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
             <div className="bg-slate-900/80 rounded-2xl p-5 sm:p-6 border border-slate-700/70 shadow-xl relative">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800/60">
-                    Selected Station
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800/60">
+                      Selected Station
+                    </span>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                      {activeFocus.region || CITY_REGION_MAP[activeFocus.city] || 'PH'}
+                    </span>
+                  </div>
                   <h3 className="text-2xl font-black text-white mt-1">
                     {activeFocus.city}
                   </h3>
@@ -303,37 +351,87 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
             </div>
           )}
 
-          {/* Quick Fly-To City Station Switcher */}
-          <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-800">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2.5">
-              Available Telemetry Stations (Click to Fly)
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              {cities.map((cityItem) => {
-                const isSelected = cityItem.city.toLowerCase() === selectedCity.toLowerCase();
-                return (
-                  <button
-                    key={cityItem.city}
-                    onClick={() => flyToCity(cityItem.city)}
-                    className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold border transition ${
-                      isSelected
-                        ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300 shadow-sm'
-                        : 'bg-slate-800/40 border-slate-700/50 text-slate-300 hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-cyan-400' : 'text-slate-400'}`} />
-                      <span>{cityItem.city}</span>
-                    </div>
-                    <span 
-                      style={{ color: cityItem.color_hex === '#FFFF00' ? '#FACC15' : cityItem.color_hex }}
-                      className="font-mono text-[11px]"
+          {/* Quick Fly-To City Station Switcher with Search & Region Filters */}
+          <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Quick Station Selector ({filteredStations.length})
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                Click to fly
+              </span>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search station or city..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700/80 rounded-lg pl-8 pr-7 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Region Pill Tabs */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
+              {REGIONS.map((reg) => (
+                <button
+                  key={reg}
+                  onClick={() => setActiveRegion(reg)}
+                  className={`px-2.5 py-1 rounded-md font-medium transition whitespace-nowrap ${
+                    activeRegion === reg
+                      ? 'bg-cyan-500 text-slate-950 font-bold shadow-sm'
+                      : 'bg-slate-800/60 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
+                >
+                  {reg}
+                </button>
+              ))}
+            </div>
+
+            {/* Scrollable Station Grid */}
+            <div className="grid grid-cols-2 gap-1.5 max-h-[190px] overflow-y-auto pr-1">
+              {filteredStations.length > 0 ? (
+                filteredStations.map((cityItem) => {
+                  const isSelected = cityItem.city.toLowerCase() === selectedCity.toLowerCase();
+                  return (
+                    <button
+                      key={cityItem.city}
+                      onClick={() => flyToCity(cityItem.city)}
+                      className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold border transition text-left ${
+                        isSelected
+                          ? 'bg-cyan-950/90 border-cyan-500 text-cyan-300 shadow-sm'
+                          : 'bg-slate-850/60 border-slate-800 hover:border-slate-700 text-slate-300 hover:bg-slate-800'
+                      }`}
                     >
-                      {cityItem.aqi}
-                    </span>
-                  </button>
-                );
-              })}
+                      <div className="flex items-center gap-1.5 truncate mr-1">
+                        <MapPin className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-400'}`} />
+                        <span className="truncate">{cityItem.city}</span>
+                      </div>
+                      <span 
+                        style={{ color: cityItem.color_hex === '#FFFF00' ? '#FACC15' : cityItem.color_hex }}
+                        className="font-mono text-[11px] shrink-0 font-bold"
+                      >
+                        {cityItem.aqi}
+                      </span>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="col-span-2 text-center py-4 text-xs text-slate-400">
+                  No stations match "{searchQuery}"
+                </div>
+              )}
             </div>
           </div>
         </div>

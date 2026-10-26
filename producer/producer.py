@@ -56,81 +56,312 @@ POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "15"))
 
 # Philippine Cities Baseline & Geospatial Metadata
 PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
+    # --- National Capital Region (NCR) ---
     "Manila": {
         "sensor_id": "PH-MNL-001",
+        "region": "NCR",
         "country": "PH",
         "latitude": 14.5995,
         "longitude": 120.9842,
-        "openaq_location_id": 8118,  # Representative OpenAQ location or nearest station
-        "baselines": {
-            "pm25": 35.4,
-            "pm10": 62.1,
-            "temperature": 31.2,
-            "humidity": 78.5
-        },
-        "bounds": {
-            "pm25": (5.0, 160.0),
-            "pm10": (12.0, 220.0),
-            "temperature": (24.0, 38.0),
-            "humidity": (45.0, 99.0)
-        }
+        "openaq_location_id": 8118,
+        "baselines": {"pm25": 35.4, "pm10": 62.1, "temperature": 31.2, "humidity": 78.5},
+        "bounds": {"pm25": (5.0, 160.0), "pm10": (12.0, 220.0), "temperature": (24.0, 38.0), "humidity": (45.0, 99.0)}
     },
     "Quezon City": {
         "sensor_id": "PH-QC-002",
+        "region": "NCR",
         "country": "PH",
         "latitude": 14.6760,
         "longitude": 121.0437,
         "openaq_location_id": 8119,
-        "baselines": {
-            "pm25": 39.8,
-            "pm10": 68.4,
-            "temperature": 30.5,
-            "humidity": 80.2
-        },
-        "bounds": {
-            "pm25": (6.0, 180.0),
-            "pm10": (15.0, 250.0),
-            "temperature": (23.5, 37.5),
-            "humidity": (48.0, 99.0)
-        }
+        "baselines": {"pm25": 39.8, "pm10": 68.4, "temperature": 30.5, "humidity": 80.2},
+        "bounds": {"pm25": (6.0, 180.0), "pm10": (15.0, 250.0), "temperature": (23.5, 37.5), "humidity": (48.0, 99.0)}
     },
+    "Makati": {
+        "sensor_id": "PH-MKT-005",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.5547,
+        "longitude": 121.0244,
+        "openaq_location_id": 8121,
+        "baselines": {"pm25": 33.2, "pm10": 58.6, "temperature": 31.4, "humidity": 76.8},
+        "bounds": {"pm25": (5.0, 150.0), "pm10": (12.0, 210.0), "temperature": (24.0, 38.0), "humidity": (45.0, 98.0)}
+    },
+    "Taguig": {
+        "sensor_id": "PH-TGG-006",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.5454,
+        "longitude": 121.0489,
+        "openaq_location_id": 8122,
+        "baselines": {"pm25": 28.5, "pm10": 51.2, "temperature": 31.0, "humidity": 77.4},
+        "bounds": {"pm25": (4.0, 140.0), "pm10": (10.0, 190.0), "temperature": (24.0, 37.0), "humidity": (46.0, 98.0)}
+    },
+    "Pasig": {
+        "sensor_id": "PH-PSG-007",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.5764,
+        "longitude": 121.0851,
+        "openaq_location_id": 8123,
+        "baselines": {"pm25": 36.1, "pm10": 64.0, "temperature": 30.8, "humidity": 79.1},
+        "bounds": {"pm25": (5.0, 160.0), "pm10": (12.0, 220.0), "temperature": (23.5, 37.5), "humidity": (48.0, 99.0)}
+    },
+    "Caloocan": {
+        "sensor_id": "PH-CAL-008",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.6416,
+        "longitude": 120.9762,
+        "openaq_location_id": 8124,
+        "baselines": {"pm25": 42.0, "pm10": 72.3, "temperature": 31.5, "humidity": 81.0},
+        "bounds": {"pm25": (6.0, 190.0), "pm10": (15.0, 260.0), "temperature": (24.0, 38.5), "humidity": (50.0, 99.0)}
+    },
+    "Parañaque": {
+        "sensor_id": "PH-PRQ-009",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.4793,
+        "longitude": 121.0198,
+        "openaq_location_id": 8125,
+        "baselines": {"pm25": 31.8, "pm10": 55.4, "temperature": 31.3, "humidity": 78.0},
+        "bounds": {"pm25": (4.0, 140.0), "pm10": (10.0, 190.0), "temperature": (24.0, 37.0), "humidity": (48.0, 98.0)}
+    },
+    "Muntinlupa": {
+        "sensor_id": "PH-MNT-010",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.4081,
+        "longitude": 121.0415,
+        "openaq_location_id": 8126,
+        "baselines": {"pm25": 27.4, "pm10": 49.8, "temperature": 30.9, "humidity": 77.2},
+        "bounds": {"pm25": (4.0, 130.0), "pm10": (9.0, 180.0), "temperature": (23.5, 36.5), "humidity": (46.0, 97.0)}
+    },
+    "Marikina": {
+        "sensor_id": "PH-MRK-011",
+        "region": "NCR",
+        "country": "PH",
+        "latitude": 14.6507,
+        "longitude": 121.1029,
+        "openaq_location_id": 8127,
+        "baselines": {"pm25": 30.2, "pm10": 53.7, "temperature": 30.1, "humidity": 82.5},
+        "bounds": {"pm25": (4.0, 140.0), "pm10": (10.0, 190.0), "temperature": (23.0, 36.0), "humidity": (50.0, 99.0)}
+    },
+
+    # --- Luzon ---
+    "Baguio City": {
+        "sensor_id": "PH-BGO-012",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 16.4023,
+        "longitude": 120.5960,
+        "openaq_location_id": 8128,
+        "baselines": {"pm25": 14.2, "pm10": 26.5, "temperature": 19.5, "humidity": 88.0},
+        "bounds": {"pm25": (2.0, 80.0), "pm10": (5.0, 120.0), "temperature": (12.0, 26.0), "humidity": (60.0, 99.0)}
+    },
+    "Angeles City": {
+        "sensor_id": "PH-ANG-013",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 15.1450,
+        "longitude": 120.5887,
+        "openaq_location_id": 8129,
+        "baselines": {"pm25": 32.5, "pm10": 58.0, "temperature": 31.8, "humidity": 74.5},
+        "bounds": {"pm25": (4.0, 150.0), "pm10": (10.0, 200.0), "temperature": (24.0, 38.0), "humidity": (45.0, 96.0)}
+    },
+    "San Fernando, Pampanga": {
+        "sensor_id": "PH-SFP-014",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 15.0307,
+        "longitude": 120.6897,
+        "openaq_location_id": 8130,
+        "baselines": {"pm25": 34.0, "pm10": 60.5, "temperature": 31.6, "humidity": 75.0},
+        "bounds": {"pm25": (5.0, 155.0), "pm10": (11.0, 210.0), "temperature": (24.0, 38.0), "humidity": (45.0, 97.0)}
+    },
+    "Antipolo": {
+        "sensor_id": "PH-ANT-015",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 14.5842,
+        "longitude": 121.1763,
+        "openaq_location_id": 8131,
+        "baselines": {"pm25": 22.4, "pm10": 41.0, "temperature": 28.9, "humidity": 82.0},
+        "bounds": {"pm25": (3.0, 110.0), "pm10": (8.0, 160.0), "temperature": (22.0, 35.0), "humidity": (50.0, 99.0)}
+    },
+    "Batangas City": {
+        "sensor_id": "PH-BTG-016",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 13.7565,
+        "longitude": 121.0583,
+        "openaq_location_id": 8132,
+        "baselines": {"pm25": 24.1, "pm10": 44.8, "temperature": 30.8, "humidity": 79.5},
+        "bounds": {"pm25": (3.0, 120.0), "pm10": (8.0, 170.0), "temperature": (23.0, 36.0), "humidity": (50.0, 98.0)}
+    },
+    "Calamba": {
+        "sensor_id": "PH-CLM-017",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 14.2140,
+        "longitude": 121.1578,
+        "openaq_location_id": 8133,
+        "baselines": {"pm25": 26.8, "pm10": 48.2, "temperature": 30.6, "humidity": 80.4},
+        "bounds": {"pm25": (4.0, 130.0), "pm10": (9.0, 180.0), "temperature": (23.0, 36.5), "humidity": (50.0, 98.0)}
+    },
+    "Puerto Princesa": {
+        "sensor_id": "PH-PPS-018",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 9.7392,
+        "longitude": 118.7353,
+        "openaq_location_id": 8134,
+        "baselines": {"pm25": 9.8, "pm10": 18.5, "temperature": 29.8, "humidity": 83.2},
+        "bounds": {"pm25": (1.0, 60.0), "pm10": (3.0, 90.0), "temperature": (23.0, 35.0), "humidity": (55.0, 99.0)}
+    },
+    "Legazpi City": {
+        "sensor_id": "PH-LGZ-019",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 13.1391,
+        "longitude": 123.7438,
+        "openaq_location_id": 8135,
+        "baselines": {"pm25": 16.5, "pm10": 31.2, "temperature": 29.2, "humidity": 85.0},
+        "bounds": {"pm25": (2.0, 90.0), "pm10": (5.0, 130.0), "temperature": (22.5, 35.0), "humidity": (55.0, 99.0)}
+    },
+    "Naga City": {
+        "sensor_id": "PH-NGA-020",
+        "region": "Luzon",
+        "country": "PH",
+        "latitude": 13.6218,
+        "longitude": 123.1948,
+        "openaq_location_id": 8136,
+        "baselines": {"pm25": 18.2, "pm10": 34.0, "temperature": 29.5, "humidity": 84.1},
+        "bounds": {"pm25": (2.0, 95.0), "pm10": (5.0, 140.0), "temperature": (23.0, 35.5), "humidity": (52.0, 98.0)}
+    },
+
+    # --- Visayas ---
     "Cebu": {
         "sensor_id": "PH-CEB-003",
+        "region": "Visayas",
         "country": "PH",
         "latitude": 10.3157,
         "longitude": 123.8854,
         "openaq_location_id": 8120,
-        "baselines": {
-            "pm25": 21.6,
-            "pm10": 41.2,
-            "temperature": 31.0,
-            "humidity": 75.0
-        },
-        "bounds": {
-            "pm25": (3.0, 110.0),
-            "pm10": (8.0, 160.0),
-            "temperature": (24.0, 36.0),
-            "humidity": (50.0, 95.0)
-        }
+        "baselines": {"pm25": 21.6, "pm10": 41.2, "temperature": 31.0, "humidity": 75.0},
+        "bounds": {"pm25": (3.0, 110.0), "pm10": (8.0, 160.0), "temperature": (24.0, 36.0), "humidity": (50.0, 95.0)}
     },
+    "Mandaue City": {
+        "sensor_id": "PH-MND-021",
+        "region": "Visayas",
+        "country": "PH",
+        "latitude": 10.3340,
+        "longitude": 123.9427,
+        "openaq_location_id": 8137,
+        "baselines": {"pm25": 23.5, "pm10": 45.0, "temperature": 31.2, "humidity": 76.1},
+        "bounds": {"pm25": (3.0, 115.0), "pm10": (8.0, 165.0), "temperature": (24.0, 36.5), "humidity": (50.0, 95.0)}
+    },
+    "Iloilo City": {
+        "sensor_id": "PH-ILO-022",
+        "region": "Visayas",
+        "country": "PH",
+        "latitude": 10.7202,
+        "longitude": 122.5621,
+        "openaq_location_id": 8138,
+        "baselines": {"pm25": 17.8, "pm10": 33.6, "temperature": 30.4, "humidity": 79.0},
+        "bounds": {"pm25": (2.0, 95.0), "pm10": (6.0, 140.0), "temperature": (23.5, 35.5), "humidity": (52.0, 97.0)}
+    },
+    "Bacolod City": {
+        "sensor_id": "PH-BCD-023",
+        "region": "Visayas",
+        "country": "PH",
+        "latitude": 10.6765,
+        "longitude": 122.9509,
+        "openaq_location_id": 8139,
+        "baselines": {"pm25": 19.4, "pm10": 36.2, "temperature": 30.5, "humidity": 78.4},
+        "bounds": {"pm25": (2.0, 100.0), "pm10": (6.0, 145.0), "temperature": (23.5, 35.5), "humidity": (52.0, 97.0)}
+    },
+    "Tacloban City": {
+        "sensor_id": "PH-TAC-024",
+        "region": "Visayas",
+        "country": "PH",
+        "latitude": 11.2442,
+        "longitude": 125.0039,
+        "openaq_location_id": 8140,
+        "baselines": {"pm25": 15.0, "pm10": 28.4, "temperature": 29.6, "humidity": 84.8},
+        "bounds": {"pm25": (2.0, 85.0), "pm10": (5.0, 125.0), "temperature": (23.0, 35.0), "humidity": (55.0, 98.0)}
+    },
+    "Tagbilaran City": {
+        "sensor_id": "PH-TAG-025",
+        "region": "Visayas",
+        "country": "PH",
+        "latitude": 9.6444,
+        "longitude": 123.8566,
+        "openaq_location_id": 8141,
+        "baselines": {"pm25": 13.5, "pm10": 25.1, "temperature": 30.0, "humidity": 81.2},
+        "bounds": {"pm25": (1.5, 80.0), "pm10": (4.0, 120.0), "temperature": (23.0, 35.0), "humidity": (55.0, 98.0)}
+    },
+
+    # --- Mindanao ---
     "Davao": {
         "sensor_id": "PH-DVO-004",
+        "region": "Mindanao",
         "country": "PH",
         "latitude": 7.1907,
         "longitude": 125.4553,
-        "openaq_location_id": 8121,
-        "baselines": {
-            "pm25": 15.2,
-            "pm10": 29.5,
-            "temperature": 29.4,
-            "humidity": 82.4
-        },
-        "bounds": {
-            "pm25": (2.0, 90.0),
-            "pm10": (5.0, 130.0),
-            "temperature": (23.0, 35.0),
-            "humidity": (55.0, 98.0)
-        }
+        "openaq_location_id": 8142,
+        "baselines": {"pm25": 15.2, "pm10": 29.5, "temperature": 29.4, "humidity": 82.4},
+        "bounds": {"pm25": (2.0, 90.0), "pm10": (5.0, 130.0), "temperature": (23.0, 35.0), "humidity": (55.0, 98.0)}
+    },
+    "Cagayan de Oro": {
+        "sensor_id": "PH-CDO-026",
+        "region": "Mindanao",
+        "country": "PH",
+        "latitude": 8.4542,
+        "longitude": 124.6319,
+        "openaq_location_id": 8143,
+        "baselines": {"pm25": 20.3, "pm10": 38.8, "temperature": 30.2, "humidity": 80.5},
+        "bounds": {"pm25": (3.0, 105.0), "pm10": (7.0, 150.0), "temperature": (23.5, 36.0), "humidity": (52.0, 98.0)}
+    },
+    "General Santos": {
+        "sensor_id": "PH-GEN-027",
+        "region": "Mindanao",
+        "country": "PH",
+        "latitude": 6.1164,
+        "longitude": 125.1716,
+        "openaq_location_id": 8144,
+        "baselines": {"pm25": 18.6, "pm10": 35.4, "temperature": 31.5, "humidity": 76.0},
+        "bounds": {"pm25": (2.5, 95.0), "pm10": (6.0, 140.0), "temperature": (24.0, 36.5), "humidity": (50.0, 96.0)}
+    },
+    "Zamboanga City": {
+        "sensor_id": "PH-ZAM-028",
+        "region": "Mindanao",
+        "country": "PH",
+        "latitude": 6.9214,
+        "longitude": 122.0790,
+        "openaq_location_id": 8145,
+        "baselines": {"pm25": 16.8, "pm10": 32.0, "temperature": 30.7, "humidity": 81.5},
+        "bounds": {"pm25": (2.0, 90.0), "pm10": (5.0, 130.0), "temperature": (23.5, 36.0), "humidity": (54.0, 98.0)}
+    },
+    "Iligan City": {
+        "sensor_id": "PH-ILG-029",
+        "region": "Mindanao",
+        "country": "PH",
+        "latitude": 8.2280,
+        "longitude": 124.2452,
+        "openaq_location_id": 8146,
+        "baselines": {"pm25": 19.1, "pm10": 36.7, "temperature": 29.9, "humidity": 83.0},
+        "bounds": {"pm25": (2.5, 100.0), "pm10": (6.0, 145.0), "temperature": (23.0, 35.5), "humidity": (55.0, 98.0)}
+    },
+    "Butuan City": {
+        "sensor_id": "PH-BUT-030",
+        "region": "Mindanao",
+        "country": "PH",
+        "latitude": 8.9475,
+        "longitude": 125.5406,
+        "openaq_location_id": 8147,
+        "baselines": {"pm25": 14.5, "pm10": 27.9, "temperature": 29.7, "humidity": 84.0},
+        "bounds": {"pm25": (2.0, 85.0), "pm10": (4.5, 125.0), "temperature": (23.0, 35.0), "humidity": (55.0, 99.0)}
     }
 }
 

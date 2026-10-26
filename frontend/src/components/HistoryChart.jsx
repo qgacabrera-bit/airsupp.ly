@@ -22,7 +22,16 @@ import {
 } from 'lucide-react';
 import { exportToPDF, exportToExcel, exportToCSV } from '../utils/exportUtils';
 
-const CITIES = ['Manila', 'Quezon City', 'Cebu', 'Davao'];
+const CITIES = [
+  // NCR
+  'Manila', 'Quezon City', 'Makati', 'Taguig', 'Pasig', 'Caloocan', 'Parañaque', 'Muntinlupa', 'Marikina',
+  // Luzon
+  'Baguio City', 'Angeles City', 'San Fernando, Pampanga', 'Antipolo', 'Batangas City', 'Calamba', 'Puerto Princesa', 'Legazpi City', 'Naga City',
+  // Visayas
+  'Cebu', 'Mandaue City', 'Iloilo City', 'Bacolod City', 'Tacloban City', 'Tagbilaran City',
+  // Mindanao
+  'Davao', 'Cagayan de Oro', 'General Santos', 'Zamboanga City', 'Iligan City', 'Butuan City'
+];
 
 // Custom Glassmorphic Tooltip for Recharts
 function CustomTooltip({ active, payload, label }) {
