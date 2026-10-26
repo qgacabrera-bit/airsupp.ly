@@ -1,140 +1,159 @@
-import React, { useState } from 'react';
-import { MapPin, Navigation, Compass, Layers, ShieldCheck, AlertTriangle } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { MapPin, Navigation, Compass, Layers, ShieldCheck, ZoomIn, RotateCcw } from 'lucide-react';
 
-// Projection helper to convert Lat/Lon to SVG 600x800 coordinate space
-function projectCoordinates(lat, lon) {
-  // Bounding box for Philippine Archipelago:
-  // Lon: 116.0 to 127.5 (width span: 11.5)
-  // Lat: 4.5 to 21.5 (height span: 17.0)
-  const x = ((lon - 116.0) / 11.5) * 600;
-  const y = ((21.5 - lat) / 17.0) * 800;
-  return { x: Math.round(x), y: Math.round(y) };
-}
-
-// Major Philippine Island Geographic SVG Paths (stylized high-definition vector contours)
-const ISLAND_PATHS = [
-  // Northern & Central Luzon Mainland + Bicol
-  {
-    id: 'luzon-main',
-    name: 'Luzon',
-    d: `M 220 120 
-        C 240 100, 290 90, 310 115 
-        C 330 135, 335 180, 320 220 
-        C 335 240, 350 270, 330 300 
-        C 310 320, 275 320, 260 305 
-        C 255 295, 235 290, 230 310 
-        C 220 330, 240 360, 280 370 
-        C 320 380, 370 370, 395 390 
-        C 415 410, 420 440, 390 460 
-        C 370 470, 345 440, 340 420 
-        C 320 420, 290 410, 270 390 
-        C 250 375, 235 340, 235 305 
-        C 220 280, 215 250, 220 220 
-        C 210 180, 205 140, 220 120 Z`
-  },
-  // Palawan
-  {
-    id: 'palawan',
-    name: 'Palawan',
-    d: `M 150 420 
-        C 160 410, 175 425, 165 460 
-        C 150 500, 130 550, 110 590 
-        C 95 620, 80 635, 75 625 
-        C 70 615, 95 560, 120 510 
-        C 135 470, 145 435, 150 420 Z`
-  },
-  // Mindoro
-  {
-    id: 'mindoro',
-    name: 'Mindoro',
-    d: `M 230 370 
-        C 250 365, 265 380, 260 410 
-        C 255 435, 240 450, 225 440 
-        C 215 430, 215 395, 225 375 Z`
-  },
-  // Panay
-  {
-    id: 'panay',
-    name: 'Panay',
-    d: `M 320 465 
-        C 345 460, 360 480, 355 510 
-        C 345 525, 325 530, 315 515 
-        C 305 495, 310 475, 320 465 Z`
-  },
-  // Negros
-  {
-    id: 'negros',
-    name: 'Negros',
-    d: `M 360 505 
-        C 375 500, 385 525, 380 560 
-        C 375 585, 360 595, 350 585 
-        C 345 565, 355 530, 360 505 Z`
-  },
-  // Cebu Island
-  {
-    id: 'cebu-island',
-    name: 'Cebu',
-    d: `M 405 500 
-        C 415 495, 420 520, 415 550 
-        C 410 575, 400 585, 395 575 
-        C 390 555, 398 520, 405 500 Z`
-  },
-  // Bohol
-  {
-    id: 'bohol',
-    name: 'Bohol',
-    d: `M 430 545 
-        C 450 540, 460 555, 455 570 
-        C 445 585, 430 580, 425 565 
-        C 420 555, 425 548, 430 545 Z`
-  },
-  // Samar & Leyte
-  {
-    id: 'samar-leyte',
-    name: 'Samar & Leyte',
-    d: `M 430 420 
-        C 450 410, 475 425, 480 460 
-        C 460 485, 445 510, 440 545 
-        C 430 550, 420 535, 425 505 
-        C 430 475, 445 450, 430 420 Z`
-  },
-  // Mindanao Mainland
-  {
-    id: 'mindanao',
-    name: 'Mindanao',
-    d: `M 370 600 
-        C 410 590, 470 590, 500 620 
-        C 525 645, 520 680, 515 720 
-        C 505 750, 470 765, 440 755 
-        C 410 745, 420 710, 390 710 
-        C 365 710, 340 735, 310 730 
-        C 290 725, 300 690, 325 680 
-        C 350 670, 360 635, 370 600 Z`
-  }
-];
+// Default center of the Philippine archipelago
+const PHILIPPINES_CENTER = [12.8797, 121.7740];
+const DEFAULT_ZOOM = 6;
 
 export default function PhilippineMap({ cities = [], selectedCity = 'Manila', onCitySelect }) {
-  const [hoveredCity, setHoveredCity] = useState(null);
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const markersGroupRef = useRef(null);
 
-  // Group cities by region for quick summary statistics
-  const activeCitiesData = cities.map((cityObj) => {
-    const coords = projectCoordinates(cityObj.latitude, cityObj.longitude);
-    return {
-      ...cityObj,
-      x: coords.x,
-      y: coords.y
-    };
-  });
-
-  const activeFocus = activeCitiesData.find(
+  // Active selected city data
+  const activeFocus = cities.find(
     (c) => c.city.toLowerCase() === selectedCity.toLowerCase()
-  ) || activeCitiesData[0];
+  ) || cities[0];
+
+  // Initialize Leaflet Map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapInstanceRef.current) return;
+
+    // Create Leaflet map instance
+    const map = L.map(mapContainerRef.current, {
+      center: PHILIPPINES_CENTER,
+      zoom: DEFAULT_ZOOM,
+      minZoom: 5,
+      maxZoom: 18,
+      zoomControl: false,
+      attributionControl: true
+    });
+
+    // Add CartoDB Dark Matter tile layer (matches dark slate aesthetic)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Zoom control at bottom-right
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Create LayerGroup for markers
+    const markersGroup = L.layerGroup().addTo(map);
+    markersGroupRef.current = markersGroup;
+    mapInstanceRef.current = map;
+
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+    };
+  }, []);
+
+  // Update Markers dynamically when cities or selection change
+  useEffect(() => {
+    if (!mapInstanceRef.current || !markersGroupRef.current || cities.length === 0) return;
+
+    const markersGroup = markersGroupRef.current;
+    markersGroup.clearLayers();
+
+    cities.forEach((item) => {
+      if (!item.latitude || !item.longitude) return;
+
+      const isSelected = item.city.toLowerCase() === selectedCity.toLowerCase();
+      const markerColor = item.color_hex || '#00E400';
+      const aqiDisplayColor = markerColor === '#FFFF00' ? '#FACC15' : markerColor;
+
+      // Custom pulsing radar DivIcon
+      const customIcon = L.divIcon({
+        className: 'custom-aqi-radar-marker',
+        html: `
+          <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <!-- Outer radar pulse -->
+            <div style="position: absolute; width: ${isSelected ? '38px' : '26px'}; height: ${isSelected ? '38px' : '26px'}; border-radius: 50%; background-color: ${markerColor}; opacity: 0.35; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"></div>
+            <!-- Secondary halo -->
+            <div style="position: absolute; width: ${isSelected ? '22px' : '16px'}; height: ${isSelected ? '22px' : '16px'}; border-radius: 50%; background-color: ${markerColor}; opacity: 0.5;"></div>
+            <!-- Central solid dot -->
+            <div style="position: relative; width: ${isSelected ? '12px' : '10px'}; height: ${isSelected ? '12px' : '10px'}; border-radius: 50%; background-color: ${markerColor}; border: 2px solid #ffffff; box-shadow: 0 0 12px ${markerColor};"></div>
+            <!-- Floating label badge -->
+            <div style="position: absolute; top: -28px; white-space: nowrap; background: rgba(15, 23, 42, 0.95); border: 1px solid ${isSelected ? markerColor : 'rgba(255,255,255,0.2)'}; padding: 2.5px 8px; border-radius: 9999px; font-size: 10px; font-family: sans-serif; font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 5px; box-shadow: 0 6px 16px rgba(0,0,0,0.6); pointer-events: none;">
+              <span>${item.city}</span>
+              <span style="color: ${aqiDisplayColor}; font-family: monospace; font-size: 11px;">${item.aqi}</span>
+            </div>
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+        popupAnchor: [0, -22]
+      });
+
+      const marker = L.marker([item.latitude, item.longitude], { icon: customIcon });
+
+      // Interactive Popup
+      const popupContent = `
+        <div style="font-family: sans-serif; min-width: 190px; color: #f8fafc; padding: 2px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 6px; margin-bottom: 8px;">
+            <strong style="font-size: 13px; color: #ffffff;">${item.city}</strong>
+            <span style="background-color: ${markerColor}25; color: ${aqiDisplayColor}; border: 1px solid ${markerColor}80; padding: 1px 7px; border-radius: 9999px; font-size: 9px; font-weight: bold; text-transform: uppercase;">
+              ${item.category}
+            </span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px;">
+            <span style="font-size: 26px; font-weight: 900; color: ${aqiDisplayColor}; line-height: 1;">${item.aqi}</span>
+            <span style="font-size: 10px; color: #94a3b8;">AQI / 500</span>
+          </div>
+          <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 4px;">
+            PM2.5: <strong style="color: #38bdf8;">${Number(item.pm25).toFixed(1)} µg/m³</strong>
+          </div>
+          <div style="font-size: 10px; color: #94a3b8; margin-bottom: 6px;">
+            Temp: ${Number(item.temperature).toFixed(1)}°C | Humidity: ${Number(item.humidity).toFixed(1)}%
+          </div>
+          <div style="background: rgba(2, 6, 23, 0.6); padding: 6px; border-radius: 6px; font-size: 10px; color: #e2e8f0; line-height: 1.35; border: 1px solid #1e293b;">
+            ${item.health_advisory}
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupContent, {
+        className: 'airsupply-leaflet-popup',
+        closeButton: false
+      });
+
+      marker.on('click', () => {
+        onCitySelect(item.city);
+      });
+
+      markersGroup.addLayer(marker);
+    });
+  }, [cities, selectedCity, onCitySelect]);
+
+  // Smoothly fly to city when selected
+  const flyToCity = (cityName) => {
+    onCitySelect(cityName);
+    const target = cities.find((c) => c.city.toLowerCase() === cityName.toLowerCase());
+    if (target && mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([target.latitude, target.longitude], 10, {
+        duration: 1.2
+      });
+    }
+  };
+
+  // Reset map view to entire country
+  const resetMap = () => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo(PHILIPPINES_CENTER, DEFAULT_ZOOM, {
+        duration: 1.2
+      });
+    }
+  };
 
   return (
     <div className="glass-panel rounded-2xl p-5 sm:p-7 border border-slate-800 shadow-2xl relative overflow-hidden">
-      {/* Background ambient radial glow */}
+      {/* Background ambient glow */}
       <div 
-        className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20"
+        className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-15"
         style={{
           background: activeFocus ? activeFocus.color_hex : '#06B6D4'
         }}
@@ -144,173 +163,56 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-5 border-b border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <Compass className="w-5 h-5 text-cyan-400 animate-spin-slow" />
+            <Compass className="w-5 h-5 text-cyan-400" />
             <h2 className="text-xl font-bold tracking-tight text-white">
-              Philippine Air Quality Geospatial Overview
+              Philippine Air Quality Map
             </h2>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Real-time atmospheric telemetry beacons mapped across the Philippine archipelago.
+            Interactive Leaflet geospatial monitoring with real-time sensor radar beacons.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-semibold bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-700/60 text-slate-300">
-          <Navigation className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Click any marker to inspect city trends</span>
+        {/* Map View Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={resetMap}
+            title="Reset view to whole Philippines"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-300 transition active:scale-95 shadow-sm"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
+            <span>National View</span>
+          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-        {/* Left Column: Interactive Vector Map (7 Columns on Large Screens) */}
-        <div className="lg:col-span-7 flex justify-center relative bg-slate-950/40 rounded-2xl p-4 border border-slate-800/80">
-          <svg
-            viewBox="50 80 500 700"
-            className="w-full max-w-[460px] h-auto drop-shadow-2xl select-none"
-            style={{ filter: 'drop-shadow(0px 8px 24px rgba(0, 0, 0, 0.6))' }}
-          >
-            {/* Coordinate Grid Guidelines */}
-            <g opacity="0.12" stroke="#38BDF8" strokeWidth="0.5" strokeDasharray="4 4">
-              <line x1="50" y1="200" x2="550" y2="200" />
-              <line x1="50" y1="400" x2="550" y2="400" />
-              <line x1="50" y1="600" x2="550" y2="600" />
-              <line x1="200" y1="80" x2="200" y2="780" />
-              <line x1="350" y1="80" x2="350" y2="780" />
-              <line x1="500" y1="80" x2="500" y2="780" />
-            </g>
+        {/* Left Column: Interactive Leaflet Map Container (7 Columns) */}
+        <div className="lg:col-span-7 relative rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-950">
+          <div
+            ref={mapContainerRef}
+            className="w-full h-[440px] sm:h-[500px] z-10"
+            style={{ background: '#0B1120' }}
+          />
 
-            {/* Geographic Landmass Shapes */}
-            <g className="transition-all duration-500">
-              {ISLAND_PATHS.map((island) => (
-                <path
-                  key={island.id}
-                  d={island.d}
-                  fill="#1E293B"
-                  stroke="#334155"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                  className="hover:fill-slate-700/60 transition-colors duration-300 cursor-default"
-                />
-              ))}
-            </g>
-
-            {/* Philippine Sea Labeling */}
-            <text x="430" y="240" fill="#475569" fontSize="11" fontFamily="sans-serif" fontWeight="bold" opacity="0.6">
-              PHILIPPINE SEA
-            </text>
-            <text x="80" y="470" fill="#475569" fontSize="10" fontFamily="sans-serif" fontWeight="bold" opacity="0.6">
-              WEST PHILIPPINE SEA
-            </text>
-            <text x="420" y="740" fill="#475569" fontSize="10" fontFamily="sans-serif" fontWeight="bold" opacity="0.6">
-              CELEBES SEA
-            </text>
-
-            {/* City Sensor Station Radar Beacons */}
-            {activeCitiesData.map((item) => {
-              const isSelected = item.city.toLowerCase() === selectedCity.toLowerCase();
-              const isHovered = hoveredCity && hoveredCity.city === item.city;
-              const markerColor = item.color_hex || '#00E400';
-
-              // Offsets for Manila vs Quezon City to avoid visual overlap
-              let offsetX = 0;
-              let offsetY = 0;
-              if (item.city === 'Quezon City') {
-                offsetX = 14;
-                offsetY = -12;
-              } else if (item.city === 'Manila') {
-                offsetX = -12;
-                offsetY = 10;
-              }
-
-              const beaconX = item.x + offsetX;
-              const beaconY = item.y + offsetY;
-
-              return (
-                <g
-                  key={item.city}
-                  transform={`translate(${beaconX}, ${beaconY})`}
-                  onClick={() => onCitySelect(item.city)}
-                  onMouseEnter={() => setHoveredCity(item)}
-                  onMouseLeave={() => setHoveredCity(null)}
-                  className="cursor-pointer group"
-                >
-                  {/* Outer Pulsing Wave Ring */}
-                  <circle
-                    r={isSelected ? "22" : "15"}
-                    fill={markerColor}
-                    opacity="0.25"
-                    className="animate-ping"
-                  />
-
-                  {/* Secondary Glow */}
-                  <circle
-                    r={isSelected ? "14" : "9"}
-                    fill={markerColor}
-                    opacity="0.4"
-                  />
-
-                  {/* Core Radar Dot */}
-                  <circle
-                    r={isSelected ? "7" : "5"}
-                    fill={markerColor}
-                    stroke="#FFFFFF"
-                    strokeWidth={isSelected ? "2.5" : "1.5"}
-                    className="drop-shadow-lg"
-                  />
-
-                  {/* City Name Badge on Map */}
-                  <g transform={`translate(${item.city === 'Manila' ? -40 : 16}, -2)`}>
-                    <rect
-                      x="-6"
-                      y="-12"
-                      width={item.city.length * 6.5 + 44}
-                      height="20"
-                      rx="10"
-                      fill="#0F172A"
-                      fillOpacity="0.9"
-                      stroke={isSelected ? markerColor : 'rgba(255, 255, 255, 0.2)'}
-                      strokeWidth={isSelected ? "1.5" : "0.8"}
-                    />
-                    <text
-                      x="0"
-                      y="2"
-                      fill="#F8FAFC"
-                      fontSize="9.5"
-                      fontFamily="sans-serif"
-                      fontWeight="bold"
-                    >
-                      {item.city}
-                    </text>
-                    <text
-                      x={item.city.length * 6.5 + 4}
-                      y="2"
-                      fill={markerColor === '#FFFF00' ? '#FACC15' : markerColor}
-                      fontSize="9"
-                      fontFamily="monospace"
-                      fontWeight="bold"
-                    >
-                      {item.aqi}
-                    </text>
-                  </g>
-                </g>
-              );
-            })}
-          </svg>
-
-          {/* Compass Rose Indicator */}
-          <div className="absolute top-6 right-6 flex flex-col items-center opacity-60 pointer-events-none">
-            <span className="text-[10px] font-bold text-slate-400 font-mono">N</span>
-            <div className="w-0.5 h-6 bg-gradient-to-b from-cyan-400 to-transparent my-0.5" />
+          {/* Map Overlay Badge */}
+          <div className="absolute top-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 text-[11px] font-semibold text-slate-300 flex items-center gap-2 shadow-lg">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span>Leaflet Live Tiles</span>
           </div>
         </div>
 
-        {/* Right Column: Active Station Deep Dive & Regional Summary (5 Columns) */}
+        {/* Right Column: Active Station Deep Dive & Quick Selector (5 Columns) */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
           {activeFocus ? (
             <div className="bg-slate-900/80 rounded-2xl p-5 sm:p-6 border border-slate-700/70 shadow-xl relative">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div>
                   <span className="text-[10px] uppercase font-bold tracking-wider text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800/60">
-                    Active Station
+                    Selected Station
                   </span>
                   <h3 className="text-2xl font-black text-white mt-1">
                     {activeFocus.city}
@@ -320,7 +222,7 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
                   </span>
                 </div>
 
-                {/* AQI Score Dial */}
+                {/* AQI Dial */}
                 <div 
                   style={{
                     backgroundColor: `${activeFocus.color_hex}15`,
@@ -340,7 +242,7 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
                 </div>
               </div>
 
-              {/* Category & Status */}
+              {/* Category */}
               <div className="mb-4">
                 <span 
                   style={{ 
@@ -394,18 +296,18 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
             </div>
           )}
 
-          {/* Regional Island Group Station Quick Picker */}
+          {/* Quick Fly-To City Station Switcher */}
           <div className="bg-slate-900/40 p-4 rounded-xl border border-slate-800">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2.5">
-              Archipelago Station Network
+              Available Telemetry Stations (Click to Fly)
             </span>
             <div className="grid grid-cols-2 gap-2">
-              {activeCitiesData.map((cityItem) => {
+              {cities.map((cityItem) => {
                 const isSelected = cityItem.city.toLowerCase() === selectedCity.toLowerCase();
                 return (
                   <button
                     key={cityItem.city}
-                    onClick={() => onCitySelect(cityItem.city)}
+                    onClick={() => flyToCity(cityItem.city)}
                     className={`flex items-center justify-between p-2 rounded-lg text-xs font-semibold border transition ${
                       isSelected
                         ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300 shadow-sm'
