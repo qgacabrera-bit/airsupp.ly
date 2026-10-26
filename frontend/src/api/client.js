@@ -8,8 +8,12 @@
  *  - Schema normalization for FastAPI responses
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+const API_BASE_URL = rawApiUrl
+  ? (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://') ? rawApiUrl : `https://${rawApiUrl}`).replace(/\/$/, '')
+  : '';
 const TIMEOUT_MS = 4000;
+
 
 // Philippine City Initial Fallbacks (if offline on first boot without cache)
 export const CITY_FALLBACK_BASELINES = [
