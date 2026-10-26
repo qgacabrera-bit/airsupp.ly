@@ -31,12 +31,19 @@ export default function PhilippineMap({ cities = [], selectedCity = 'Manila', on
       attributionControl: true
     });
 
-    // Add CartoDB Dark Matter tile layer (matches dark slate aesthetic)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
+    // Add Esri World Dark Gray Canvas Base tile layer (100% free, no API key required)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      maxZoom: 16
     }).addTo(map);
+
+    // Add Esri World Dark Gray Labels / Reference layer
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '',
+      maxZoom: 16,
+      opacity: 0.85
+    }).addTo(map);
+
 
     // Zoom control at bottom-right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
