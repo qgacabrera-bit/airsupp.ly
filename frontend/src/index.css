@@ -4,12 +4,17 @@
 
 @layer base {
   body {
-    @apply bg-[#0B1329] text-slate-100 font-sans antialiased;
-    background-color: #0B1329;
+    @apply bg-[#080D1A] text-slate-100 font-sans antialiased;
+    background-color: #080D1A;
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(45, 212, 191, 0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 85% 100%, rgba(30, 58, 138, 0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 30% at 15% 70%, rgba(20, 184, 166, 0.04) 0%, transparent 50%);
+      /* Subtle top-down studio vignette gently illuminating the dashboard center */
+      radial-gradient(ellipse 85% 55% at 50% -10%, rgba(255, 255, 255, 0.03) 0%, transparent 70%),
+      /* Top-left atmospheric morning light: low-opacity soft teal/sage (3.5%) */
+      radial-gradient(circle 850px at 0% 0%, rgba(45, 212, 191, 0.035) 0%, transparent 70%),
+      /* Bottom-right atmospheric evening light: low-opacity burnt amber (3.5%) */
+      radial-gradient(circle 950px at 100% 100%, rgba(217, 119, 6, 0.035) 0%, transparent 70%),
+      /* Soft peripheral vignette fading outer boundaries into deep midnight shadow */
+      radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(3, 7, 18, 0.6) 100%);
     background-attachment: fixed;
   }
 }
@@ -42,7 +47,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B1329;
+  background: #080D1A;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -57,7 +62,7 @@
 /* Leaflet Dark Theme Overrides */
 .leaflet-container {
   font-family: inherit;
-  background-color: #0B1329 !important;
+  background-color: #080D1A !important;
 }
 
 .leaflet-popup-content-wrapper {

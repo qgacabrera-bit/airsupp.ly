@@ -361,7 +361,7 @@ export default function PhilippineMap({
           <div
             ref={mapContainerRef}
             className="w-full h-[480px] sm:h-[560px] z-10 flex-1"
-            style={{ background: '#0B1329' }}
+            style={{ background: '#080D1A' }}
           />
         </div>
 
