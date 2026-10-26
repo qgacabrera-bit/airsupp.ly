@@ -14,24 +14,40 @@
   inset: 0;
   background-image: url('/airsupply-background.jpg');
   background-size: cover;
-  background-position: center 25%;
+  background-position: center 30%;
   background-repeat: no-repeat;
   pointer-events: none;
   z-index: 0;
-  transition: opacity 0.5s ease, filter 0.5s ease;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+/* Subtle gradient scrim over the photo to keep content effortlessly legible */
+.app-bg-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: background 0.4s ease;
 }
 
 .dark .app-bg-backdrop {
-  opacity: 0.08;
-  filter: contrast(120%) brightness(55%) saturate(75%);
-  mix-blend-mode: luminosity;
+  opacity: 0.28;
+  filter: contrast(115%) brightness(75%) saturate(85%);
+}
+
+.dark .app-bg-backdrop::after {
+  background: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(8, 13, 26, 0.45) 0%, rgba(8, 13, 26, 0.85) 100%);
 }
 
 html:not(.dark) .app-bg-backdrop,
 .light .app-bg-backdrop {
-  opacity: 0.12;
-  filter: contrast(105%) brightness(95%) saturate(85%);
-  mix-blend-mode: multiply;
+  opacity: 0.25;
+  filter: contrast(108%) brightness(96%) saturate(90%);
+}
+
+html:not(.dark) .app-bg-backdrop::after,
+.light .app-bg-backdrop::after {
+  background: radial-gradient(ellipse 90% 80% at 50% 30%, rgba(248, 250, 252, 0.42) 0%, rgba(248, 250, 252, 0.82) 100%);
 }
 
 /* Root Dark Mode Atmospheric Slate & Studio Vignette */
