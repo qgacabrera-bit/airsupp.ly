@@ -1,6 +1,5 @@
 # AirSupp.ly 🇵🇭
 ### Real-Time Environmental Health Platform for the Philippines
-**Tagline: *"All Out of Smog"***
 
 A complete, production-ready, fully containerized real-time environmental monitoring platform. Built with an Apache Kafka KRaft event stream, a PySpark Structured Streaming window analytics engine, MongoDB 7.0 time-series storage, an asynchronous FastAPI middleware layer, and an offline-first React (Vite) + Tailwind CSS Progressive Web App (PWA) served via Nginx.
 
