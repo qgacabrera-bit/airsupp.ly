@@ -16,6 +16,7 @@ export const CITY_REGION_MAP = {
   'Pasig': 'NCR',
   'Caloocan': 'NCR',
   'Parañaque': 'NCR',
+  'Paranaque': 'NCR',
   'Muntinlupa': 'NCR',
   'Marikina': 'NCR',
   'Baguio City': 'Luzon',

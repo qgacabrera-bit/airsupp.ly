@@ -4,15 +4,15 @@ import AQICard from './components/AQICard';
 import HistoryChart from './components/HistoryChart';
 import AQIScaleReference from './components/AQIScaleReference';
 import PhilippineMap, { CITY_REGION_MAP } from './components/PhilippineMap';
-import { getLiveMetrics, getHistoryMetrics } from './api/client';
+import { getLiveMetrics, getHistoryMetrics, CITY_FALLBACK_BASELINES } from './api/client';
 
 import { MapPin, RefreshCw, AlertCircle, Info, Sparkles, Filter } from 'lucide-react';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
 export default function App() {
-  // State: Live Stream
-  const [liveCities, setLiveCities] = useState([]);
+  // State: Live Stream initialized with full 30 Philippine stations
+  const [liveCities, setLiveCities] = useState(CITY_FALLBACK_BASELINES);
   const [cardRegion, setCardRegion] = useState('All');
   const [isOffline, setIsOffline] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);

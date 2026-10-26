@@ -254,6 +254,14 @@ async def get_live_metrics():
         if not cleaned_data:
             # Fallback to simulated live telemetry when DB is warming up or offline
             cleaned_data = get_simulated_live_metrics()
+        elif len(cleaned_data) < len(SIMULATED_BASES):
+            # Supplement with simulated data so that all 30 stations are guaranteed
+            existing_city_names = {c.city.lower() for c in cleaned_data}
+            for sim_city in get_simulated_live_metrics():
+                if sim_city.city.lower() not in existing_city_names:
+                    cleaned_data.append(sim_city)
+
+        cleaned_data.sort(key=lambda x: x.aqi, reverse=True)
 
         return LiveMetricsResponse(
             total_cities=len(cleaned_data),

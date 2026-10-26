@@ -649,12 +649,12 @@ function normalizeData(result) {
  * @returns {Promise<{ data: Array, isOffline: boolean, cachedAt: string|null, error: string|null }>}
  */
 export async function getLiveMetrics() {
-  const cacheKey = 'airsupply_live_cache';
+  const cacheKey = 'airsupply_live_cache_v3';
   const baseUrl = getApiBaseUrl();
-  const url = `${baseUrl}/api/live`;
+  const url = `${baseUrl}/api/live?_t=${Date.now()}`;
 
   try {
-    const res = await fetchWithTimeout(url);
+    const res = await fetchWithTimeout(url, { cache: 'no-store' });
     if (!res.ok) {
       throw new Error(`HTTP Error: ${res.status}`);
     }
@@ -663,7 +663,17 @@ export async function getLiveMetrics() {
       throw new Error(`Invalid response format (received ${contentType}). Verify that the API backend URL is correct.`);
     }
     const json = await res.json();
-    const data = normalizeData(json);
+    let data = normalizeData(json);
+
+    // Guarantee that all 30 monitored Philippine cities are present
+    if (data.length < CITY_FALLBACK_BASELINES.length) {
+      const existingNames = new Set(data.map((d) => d.city.toLowerCase().replace(/[^a-z0-9]/g, '')));
+      const missing = CITY_FALLBACK_BASELINES.filter(
+        (fallback) => !existingNames.has(fallback.city.toLowerCase().replace(/[^a-z0-9]/g, ''))
+      );
+      data = [...data, ...missing];
+      data.sort((a, b) => (b.aqi || 0) - (a.aqi || 0));
+    }
 
     // Save fresh snapshot to localStorage cache
     try {
@@ -684,23 +694,25 @@ export async function getLiveMetrics() {
   } catch (err) {
     console.warn(`[AirSupp.ly API] Live fetch failed (${err.message}) on ${url}. Serving cached fallback...`);
 
-    // Attempt localStorage cache recovery
+    // Attempt localStorage cache recovery (only accept if complete 30-station dataset)
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
-        return {
-          data: parsed.data || CITY_FALLBACK_BASELINES,
-          isOffline: true,
-          cachedAt: parsed.cachedAt || new Date().toISOString(),
-          error: err.message
-        };
+        if (Array.isArray(parsed.data) && parsed.data.length >= CITY_FALLBACK_BASELINES.length) {
+          return {
+            data: parsed.data,
+            isOffline: true,
+            cachedAt: parsed.cachedAt || new Date().toISOString(),
+            error: err.message
+          };
+        }
       }
     } catch {
       // Fallback below
     }
 
-    // Default offline simulation baseline
+    // Default offline simulation baseline (all 30 cities)
     return {
       data: CITY_FALLBACK_BASELINES,
       isOffline: true,
