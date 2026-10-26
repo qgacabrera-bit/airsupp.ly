@@ -23,8 +23,8 @@ export function getApiBaseUrl() {
   return DEFAULT_API_URL;
 }
 
-// Increased timeout to 15s to gracefully handle Render free tier cold-start wakeups
-const TIMEOUT_MS = 15000;
+// Increased timeout to 30s to gracefully handle Render free tier cold-start wakeups
+const TIMEOUT_MS = 30000;
 
 
 

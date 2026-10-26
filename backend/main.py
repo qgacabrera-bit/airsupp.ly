@@ -10,6 +10,7 @@ Environmental Health Platform:
   - GET /api/cities: Active city catalog
 """
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -42,11 +43,22 @@ logger = logging.getLogger("airsupply.api")
 async def lifespan(app: FastAPI):
     """
     Manages FastAPI application startup and shutdown lifecycle.
+    Initializes database and runs background continuous telemetry streaming to MongoDB.
     """
     logger.info("Initializing AirSupp.ly Middleware API...")
     await DatabaseManager.connect()
+    
+    # Launch background continuous MongoDB ingestion & sync worker
+    worker_task = asyncio.create_task(telemetry_ingestion_worker())
+    
     yield
+    
     logger.info("Shutting down AirSupp.ly Middleware API...")
+    worker_task.cancel()
+    try:
+        await worker_task
+    except asyncio.CancelledError:
+        pass
     await DatabaseManager.disconnect()
 
 
@@ -59,11 +71,11 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configure Cross-Origin Resource Sharing (CORS)
+# Configure Cross-Origin Resource Sharing (CORS) - open to all origins without credentials
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS if settings.CORS_ORIGINS else ["*"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -205,6 +217,81 @@ def get_simulated_history_metrics(city: Optional[str] = "Manila", limit: int = 5
             processed_at=iso_pt
         ))
     return points
+
+
+async def sync_to_mongodb():
+    """
+    Writes fresh 30-city atmospheric telemetry into MongoDB:
+    1. Upserts into collection `live_metrics` (replace_one with upsert=True)
+    2. Appends batch snapshots into collection `history_logs`
+    3. Prunes old history logs (> 5,000 points) to preserve storage quotas
+    """
+    try:
+        db = DatabaseManager.get_db()
+        if db is None:
+            return
+
+        live_metrics = get_simulated_live_metrics()
+        live_col = db[settings.MONGO_LIVE_COLLECTION]
+        history_col = db[settings.MONGO_HISTORY_COLLECTION]
+
+        # 1. Update live_metrics for all 30 cities
+        for metric in live_metrics:
+            doc = metric.model_dump() if hasattr(metric, "model_dump") else metric.dict()
+            await live_col.replace_one(
+                {"city": metric.city},
+                doc,
+                upsert=True
+            )
+
+        # 2. Append snapshot to history_logs
+        history_docs = [
+            metric.model_dump() if hasattr(metric, "model_dump") else metric.dict()
+            for metric in live_metrics
+        ]
+        await history_col.insert_many(history_docs)
+
+        # 3. Clean up older historical logs to stay well within free tier quota
+        try:
+            total_history = await history_col.count_documents({})
+            if total_history > 5000:
+                delete_count = total_history - 5000
+                oldest_cursor = history_col.find().sort("window_start", 1).limit(delete_count)
+                oldest_docs = await oldest_cursor.to_list(length=delete_count)
+                if oldest_docs:
+                    old_ids = [d["_id"] for d in oldest_docs]
+                    await history_col.delete_many({"_id": {"$in": old_ids}})
+        except Exception:
+            pass
+
+        logger.info(
+            "MongoDB Background Sync: 30 stations updated in '%s', snapshot batch logged to '%s'.",
+            settings.MONGO_LIVE_COLLECTION,
+            settings.MONGO_HISTORY_COLLECTION
+        )
+    except Exception as ex:
+        logger.warning("MongoDB background sync warning: %s", ex)
+
+
+async def telemetry_ingestion_worker():
+    """
+    Continuous background streaming worker running every 15 seconds.
+    Ensures MongoDB Atlas is always live and receiving telemetry updates.
+    """
+    logger.info("Starting background telemetry ingestion worker for MongoDB...")
+    # Initial immediate sync upon boot
+    await sync_to_mongodb()
+
+    while True:
+        try:
+            await asyncio.sleep(15.0)
+            await sync_to_mongodb()
+        except asyncio.CancelledError:
+            logger.info("Telemetry ingestion worker cancelled.")
+            break
+        except Exception as e:
+            logger.warning("Telemetry ingestion worker error: %s", e)
+            await asyncio.sleep(5.0)
 
 
 

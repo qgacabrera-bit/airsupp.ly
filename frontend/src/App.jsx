@@ -107,25 +107,6 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-8">
-        {/* Reconnecting Notice Banner (only if network fails) */}
-        {isOffline && (
-          <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3.5 flex items-center justify-between gap-3 text-amber-200 text-xs sm:text-sm animate-fade-in shadow-md">
-            <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
-              <span>
-                <strong>Connecting to Server:</strong> Synchronizing air quality telemetry. Serving cached data while connecting.
-              </span>
-            </div>
-            <button
-              onClick={() => fetchLive(true)}
-              disabled={isRefreshing}
-              className="px-3 py-1 bg-amber-900/60 hover:bg-amber-800/80 rounded-lg text-xs font-semibold text-amber-100 border border-amber-700/60 transition shrink-0 flex items-center gap-1"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>Retry</span>
-            </button>
-          </div>
-        )}
 
         {/* Section 1: Real-Time City Telemetry Dashboard */}
         <section>
@@ -240,7 +221,7 @@ export default function App() {
                           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-cyan-300 hover:text-cyan-200 transition active:scale-95 shadow-sm"
                         >
                           <ChevronDown className="w-4 h-4 text-cyan-400" />
-                          <span>See More (+2 Rows)</span>
+                          <span>See More</span>
                         </button>
                       )}
 
