@@ -63,7 +63,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.5995,
         "longitude": 120.9842,
-        "openaq_location_id": 8118,
+        "openaq_location_id": 1543132,
         "baselines": {"pm25": 35.4, "pm10": 62.1, "temperature": 31.2, "humidity": 78.5},
         "bounds": {"pm25": (5.0, 160.0), "pm10": (12.0, 220.0), "temperature": (24.0, 38.0), "humidity": (45.0, 99.0)}
     },
@@ -73,7 +73,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.6760,
         "longitude": 121.0437,
-        "openaq_location_id": 8119,
+        "openaq_location_id": 1846215,
         "baselines": {"pm25": 39.8, "pm10": 68.4, "temperature": 30.5, "humidity": 80.2},
         "bounds": {"pm25": (6.0, 180.0), "pm10": (15.0, 250.0), "temperature": (23.5, 37.5), "humidity": (48.0, 99.0)}
     },
@@ -83,7 +83,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.5547,
         "longitude": 121.0244,
-        "openaq_location_id": 8121,
+        "openaq_location_id": 4797655,
         "baselines": {"pm25": 33.2, "pm10": 58.6, "temperature": 31.4, "humidity": 76.8},
         "bounds": {"pm25": (5.0, 150.0), "pm10": (12.0, 210.0), "temperature": (24.0, 38.0), "humidity": (45.0, 98.0)}
     },
@@ -93,7 +93,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.5454,
         "longitude": 121.0489,
-        "openaq_location_id": 8122,
+        "openaq_location_id": None,
         "baselines": {"pm25": 28.5, "pm10": 51.2, "temperature": 31.0, "humidity": 77.4},
         "bounds": {"pm25": (4.0, 140.0), "pm10": (10.0, 190.0), "temperature": (24.0, 37.0), "humidity": (46.0, 98.0)}
     },
@@ -103,7 +103,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.5764,
         "longitude": 121.0851,
-        "openaq_location_id": 8123,
+        "openaq_location_id": 3015285,
         "baselines": {"pm25": 36.1, "pm10": 64.0, "temperature": 30.8, "humidity": 79.1},
         "bounds": {"pm25": (5.0, 160.0), "pm10": (12.0, 220.0), "temperature": (23.5, 37.5), "humidity": (48.0, 99.0)}
     },
@@ -113,7 +113,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.6416,
         "longitude": 120.9762,
-        "openaq_location_id": 8124,
+        "openaq_location_id": 4526987,
         "baselines": {"pm25": 42.0, "pm10": 72.3, "temperature": 31.5, "humidity": 81.0},
         "bounds": {"pm25": (6.0, 190.0), "pm10": (15.0, 260.0), "temperature": (24.0, 38.5), "humidity": (50.0, 99.0)}
     },
@@ -123,7 +123,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.4793,
         "longitude": 121.0198,
-        "openaq_location_id": 8125,
+        "openaq_location_id": 4797654,
         "baselines": {"pm25": 31.8, "pm10": 55.4, "temperature": 31.3, "humidity": 78.0},
         "bounds": {"pm25": (4.0, 140.0), "pm10": (10.0, 190.0), "temperature": (24.0, 37.0), "humidity": (48.0, 98.0)}
     },
@@ -133,7 +133,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.4081,
         "longitude": 121.0415,
-        "openaq_location_id": 8126,
+        "openaq_location_id": 4797656,
         "baselines": {"pm25": 27.4, "pm10": 49.8, "temperature": 30.9, "humidity": 77.2},
         "bounds": {"pm25": (4.0, 130.0), "pm10": (9.0, 180.0), "temperature": (23.5, 36.5), "humidity": (46.0, 97.0)}
     },
@@ -143,7 +143,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.6507,
         "longitude": 121.1029,
-        "openaq_location_id": 8127,
+        "openaq_location_id": 6265529,
         "baselines": {"pm25": 30.2, "pm10": 53.7, "temperature": 30.1, "humidity": 82.5},
         "bounds": {"pm25": (4.0, 140.0), "pm10": (10.0, 190.0), "temperature": (23.0, 36.0), "humidity": (50.0, 99.0)}
     },
@@ -155,7 +155,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 16.4023,
         "longitude": 120.5960,
-        "openaq_location_id": 8128,
+        "openaq_location_id": 4725233,
         "baselines": {"pm25": 14.2, "pm10": 26.5, "temperature": 19.5, "humidity": 88.0},
         "bounds": {"pm25": (2.0, 80.0), "pm10": (5.0, 120.0), "temperature": (12.0, 26.0), "humidity": (60.0, 99.0)}
     },
@@ -165,7 +165,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 15.1450,
         "longitude": 120.5887,
-        "openaq_location_id": 8129,
+        "openaq_location_id": None,
         "baselines": {"pm25": 32.5, "pm10": 58.0, "temperature": 31.8, "humidity": 74.5},
         "bounds": {"pm25": (4.0, 150.0), "pm10": (10.0, 200.0), "temperature": (24.0, 38.0), "humidity": (45.0, 96.0)}
     },
@@ -175,7 +175,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 15.0307,
         "longitude": 120.6897,
-        "openaq_location_id": 8130,
+        "openaq_location_id": 2812740,
         "baselines": {"pm25": 34.0, "pm10": 60.5, "temperature": 31.6, "humidity": 75.0},
         "bounds": {"pm25": (5.0, 155.0), "pm10": (11.0, 210.0), "temperature": (24.0, 38.0), "humidity": (45.0, 97.0)}
     },
@@ -185,7 +185,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.5842,
         "longitude": 121.1763,
-        "openaq_location_id": 8131,
+        "openaq_location_id": None,
         "baselines": {"pm25": 22.4, "pm10": 41.0, "temperature": 28.9, "humidity": 82.0},
         "bounds": {"pm25": (3.0, 110.0), "pm10": (8.0, 160.0), "temperature": (22.0, 35.0), "humidity": (50.0, 99.0)}
     },
@@ -195,7 +195,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 13.7565,
         "longitude": 121.0583,
-        "openaq_location_id": 8132,
+        "openaq_location_id": None,
         "baselines": {"pm25": 24.1, "pm10": 44.8, "temperature": 30.8, "humidity": 79.5},
         "bounds": {"pm25": (3.0, 120.0), "pm10": (8.0, 170.0), "temperature": (23.0, 36.0), "humidity": (50.0, 98.0)}
     },
@@ -205,7 +205,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 14.2140,
         "longitude": 121.1578,
-        "openaq_location_id": 8133,
+        "openaq_location_id": 6518182,
         "baselines": {"pm25": 26.8, "pm10": 48.2, "temperature": 30.6, "humidity": 80.4},
         "bounds": {"pm25": (4.0, 130.0), "pm10": (9.0, 180.0), "temperature": (23.0, 36.5), "humidity": (50.0, 98.0)}
     },
@@ -215,7 +215,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 9.7392,
         "longitude": 118.7353,
-        "openaq_location_id": 8134,
+        "openaq_location_id": None,
         "baselines": {"pm25": 9.8, "pm10": 18.5, "temperature": 29.8, "humidity": 83.2},
         "bounds": {"pm25": (1.0, 60.0), "pm10": (3.0, 90.0), "temperature": (23.0, 35.0), "humidity": (55.0, 99.0)}
     },
@@ -225,7 +225,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 13.1391,
         "longitude": 123.7438,
-        "openaq_location_id": 8135,
+        "openaq_location_id": None,
         "baselines": {"pm25": 16.5, "pm10": 31.2, "temperature": 29.2, "humidity": 85.0},
         "bounds": {"pm25": (2.0, 90.0), "pm10": (5.0, 130.0), "temperature": (22.5, 35.0), "humidity": (55.0, 99.0)}
     },
@@ -235,7 +235,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 13.6218,
         "longitude": 123.1948,
-        "openaq_location_id": 8136,
+        "openaq_location_id": None,
         "baselines": {"pm25": 18.2, "pm10": 34.0, "temperature": 29.5, "humidity": 84.1},
         "bounds": {"pm25": (2.0, 95.0), "pm10": (5.0, 140.0), "temperature": (23.0, 35.5), "humidity": (52.0, 98.0)}
     },
@@ -247,8 +247,8 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 10.3157,
         "longitude": 123.8854,
-        "openaq_location_id": 8120,
-        "baselines": {"pm25": 21.6, "pm10": 41.2, "temperature": 31.0, "humidity": 75.0},
+        "openaq_location_id": 6455462,
+        "baselines": {"pm25": 11.0, "pm10": 19.8, "temperature": 31.0, "humidity": 75.0},
         "bounds": {"pm25": (3.0, 110.0), "pm10": (8.0, 160.0), "temperature": (24.0, 36.0), "humidity": (50.0, 95.0)}
     },
     "Mandaue City": {
@@ -257,7 +257,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 10.3340,
         "longitude": 123.9427,
-        "openaq_location_id": 8137,
+        "openaq_location_id": None,
         "baselines": {"pm25": 23.5, "pm10": 45.0, "temperature": 31.2, "humidity": 76.1},
         "bounds": {"pm25": (3.0, 115.0), "pm10": (8.0, 165.0), "temperature": (24.0, 36.5), "humidity": (50.0, 95.0)}
     },
@@ -267,7 +267,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 10.7202,
         "longitude": 122.5621,
-        "openaq_location_id": 8138,
+        "openaq_location_id": 2879671,
         "baselines": {"pm25": 17.8, "pm10": 33.6, "temperature": 30.4, "humidity": 79.0},
         "bounds": {"pm25": (2.0, 95.0), "pm10": (6.0, 140.0), "temperature": (23.5, 35.5), "humidity": (52.0, 97.0)}
     },
@@ -277,7 +277,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 10.6765,
         "longitude": 122.9509,
-        "openaq_location_id": 8139,
+        "openaq_location_id": 6484875,
         "baselines": {"pm25": 19.4, "pm10": 36.2, "temperature": 30.5, "humidity": 78.4},
         "bounds": {"pm25": (2.0, 100.0), "pm10": (6.0, 145.0), "temperature": (23.5, 35.5), "humidity": (52.0, 97.0)}
     },
@@ -287,7 +287,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 11.2442,
         "longitude": 125.0039,
-        "openaq_location_id": 8140,
+        "openaq_location_id": None,
         "baselines": {"pm25": 15.0, "pm10": 28.4, "temperature": 29.6, "humidity": 84.8},
         "bounds": {"pm25": (2.0, 85.0), "pm10": (5.0, 125.0), "temperature": (23.0, 35.0), "humidity": (55.0, 98.0)}
     },
@@ -297,7 +297,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 9.6444,
         "longitude": 123.8566,
-        "openaq_location_id": 8141,
+        "openaq_location_id": None,
         "baselines": {"pm25": 13.5, "pm10": 25.1, "temperature": 30.0, "humidity": 81.2},
         "bounds": {"pm25": (1.5, 80.0), "pm10": (4.0, 120.0), "temperature": (23.0, 35.0), "humidity": (55.0, 98.0)}
     },
@@ -309,7 +309,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 7.1907,
         "longitude": 125.4553,
-        "openaq_location_id": 8142,
+        "openaq_location_id": 6163209,
         "baselines": {"pm25": 15.2, "pm10": 29.5, "temperature": 29.4, "humidity": 82.4},
         "bounds": {"pm25": (2.0, 90.0), "pm10": (5.0, 130.0), "temperature": (23.0, 35.0), "humidity": (55.0, 98.0)}
     },
@@ -319,7 +319,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 8.4542,
         "longitude": 124.6319,
-        "openaq_location_id": 8143,
+        "openaq_location_id": None,
         "baselines": {"pm25": 20.3, "pm10": 38.8, "temperature": 30.2, "humidity": 80.5},
         "bounds": {"pm25": (3.0, 105.0), "pm10": (7.0, 150.0), "temperature": (23.5, 36.0), "humidity": (52.0, 98.0)}
     },
@@ -329,7 +329,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 6.1164,
         "longitude": 125.1716,
-        "openaq_location_id": 8144,
+        "openaq_location_id": None,
         "baselines": {"pm25": 18.6, "pm10": 35.4, "temperature": 31.5, "humidity": 76.0},
         "bounds": {"pm25": (2.5, 95.0), "pm10": (6.0, 140.0), "temperature": (24.0, 36.5), "humidity": (50.0, 96.0)}
     },
@@ -339,7 +339,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 6.9214,
         "longitude": 122.0790,
-        "openaq_location_id": 8145,
+        "openaq_location_id": None,
         "baselines": {"pm25": 16.8, "pm10": 32.0, "temperature": 30.7, "humidity": 81.5},
         "bounds": {"pm25": (2.0, 90.0), "pm10": (5.0, 130.0), "temperature": (23.5, 36.0), "humidity": (54.0, 98.0)}
     },
@@ -349,7 +349,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 8.2280,
         "longitude": 124.2452,
-        "openaq_location_id": 8146,
+        "openaq_location_id": None,
         "baselines": {"pm25": 19.1, "pm10": 36.7, "temperature": 29.9, "humidity": 83.0},
         "bounds": {"pm25": (2.5, 100.0), "pm10": (6.0, 145.0), "temperature": (23.0, 35.5), "humidity": (55.0, 98.0)}
     },
@@ -359,7 +359,7 @@ PHILIPPINE_CITIES: Dict[str, Dict[str, Any]] = {
         "country": "PH",
         "latitude": 8.9475,
         "longitude": 125.5406,
-        "openaq_location_id": 8147,
+        "openaq_location_id": None,
         "baselines": {"pm25": 14.5, "pm10": 27.9, "temperature": 29.7, "humidity": 84.0},
         "bounds": {"pm25": (2.0, 85.0), "pm10": (4.5, 125.0), "temperature": (23.0, 35.0), "humidity": (55.0, 99.0)}
     }
@@ -376,26 +376,41 @@ class MakingAirSimulationState:
     def __init__(self, city_name: str, config: Dict[str, Any]):
         self.city_name = city_name
         self.config = config
-        self.current_state = {
+        self.active_baselines = {
             "pm25": float(config["baselines"]["pm25"]),
             "pm10": float(config["baselines"]["pm10"]),
             "temperature": float(config["baselines"]["temperature"]),
             "humidity": float(config["baselines"]["humidity"])
         }
+        self.current_state = self.active_baselines.copy()
         self.last_api_reading: Optional[float] = None
         self.last_api_update_time: Optional[float] = None
+
+    def update_with_live_telemetry(self, live_data: Dict[str, float]):
+        """Anchors active baselines to real ground station telemetry."""
+        if "pm25" in live_data:
+            self.last_api_reading = live_data["pm25"]
+            self.last_api_update_time = time.time()
+            self.active_baselines["pm25"] = float(live_data["pm25"])
+            # Derive PM10 proportionally if physical station only monitors PM2.5
+            self.active_baselines["pm10"] = float(live_data.get("pm10", round(live_data["pm25"] * 1.8, 1)))
+            if "temperature" in live_data:
+                self.active_baselines["temperature"] = float(live_data["temperature"])
+            if "humidity" in live_data:
+                self.active_baselines["humidity"] = float(live_data["humidity"])
+            self.current_state = self.active_baselines.copy()
 
     def step_micro_fluctuation(self) -> Dict[str, float]:
         """
         Advances the telemetry state by 1 step (15 seconds) using bounded
-        random-walk jitter with mean reversion towards the baseline.
+        random-walk jitter with mean reversion towards the active baseline.
         """
-        baselines = self.config["baselines"]
+        baselines = self.active_baselines
         bounds = self.config["bounds"]
 
         jitter_specs = {
-            "pm25": {"reversion": 0.08, "noise_sd": 1.1},
-            "pm10": {"reversion": 0.08, "noise_sd": 1.8},
+            "pm25": {"reversion": 0.12, "noise_sd": 0.25 if self.last_api_reading else 1.1},
+            "pm10": {"reversion": 0.12, "noise_sd": 0.45 if self.last_api_reading else 1.8},
             "temperature": {"reversion": 0.05, "noise_sd": 0.12},
             "humidity": {"reversion": 0.05, "noise_sd": 0.35}
         }
@@ -471,36 +486,61 @@ class TelemetryIngestor:
     def fetch_openaq_telemetry(self, city: str, config: Dict[str, Any]) -> Optional[Dict[str, float]]:
         """
         Attempts to fetch live telemetry from OpenAQ API v3.
-        Falls back to None on rate limits (429), auth failure, or missing stations.
+        Tries /locations/{id}/sensors (returns parameters + latest values).
+        Falls back to /locations/{id}/latest.
         """
+        location_id = config.get("openaq_location_id")
+        if not location_id:
+            return None
+
         try:
-            # OpenAQ v3 /locations endpoint or /sensors
-            location_id = config.get("openaq_location_id")
-            url = f"{OPENAQ_BASE_URL}/locations/{location_id}/latest"
-            response = self.http_session.get(url, timeout=4.0)
+            # 1. Primary: /locations/{location_id}/sensors gives parameter mapping and latest readings
+            url = f"{OPENAQ_BASE_URL}/locations/{location_id}/sensors"
+            response = self.http_session.get(url, timeout=5.0)
 
             if response.status_code == 200:
                 data = response.json()
                 results = data.get("results", [])
                 telemetry: Dict[str, float] = {}
                 for item in results:
-                    parameter = item.get("parameter", {}).get("name")
-                    value = item.get("value")
-                    if parameter == "pm25" and value is not None:
-                        telemetry["pm25"] = round(float(value), 2)
-                    elif parameter == "pm10" and value is not None:
-                        telemetry["pm10"] = round(float(value), 2)
-                    elif parameter == "temperature" and value is not None:
-                        telemetry["temperature"] = round(float(value), 2)
-                    elif parameter == "relativehumidity" and value is not None:
-                        telemetry["humidity"] = round(float(value), 2)
+                    param_name = str(item.get("parameter", {}).get("name", "")).lower()
+                    latest = item.get("latest") or {}
+                    val = latest.get("value")
+                    if val is not None:
+                        try:
+                            fval = round(float(val), 2)
+                            if "pm25" in param_name or param_name == "pm2.5":
+                                telemetry["pm25"] = fval
+                            elif "pm10" in param_name:
+                                telemetry["pm10"] = fval
+                            elif "temperature" in param_name:
+                                telemetry["temperature"] = fval
+                            elif "relativehumidity" in param_name or "humidity" in param_name:
+                                telemetry["humidity"] = fval
+                        except (ValueError, TypeError):
+                            pass
 
                 if "pm25" in telemetry:
                     return telemetry
+
             elif response.status_code == 429:
                 logger.warning("OpenAQ API rate limit reached (HTTP 429). Triggering Fallback Mode.")
-            elif response.status_code == 401 or response.status_code == 403:
-                logger.debug("OpenAQ API Key invalid or restricted. Triggering Fallback Mode.")
+                return None
+            elif response.status_code in (401, 403):
+                logger.warning("OpenAQ API key unauthorized/forbidden (HTTP %d). Check OPENAQ_API_KEY.", response.status_code)
+                return None
+
+            # 2. Secondary fallback: /locations/{location_id}/latest
+            url_latest = f"{OPENAQ_BASE_URL}/locations/{location_id}/latest"
+            resp_latest = self.http_session.get(url_latest, timeout=5.0)
+            if resp_latest.status_code == 200:
+                data = resp_latest.json()
+                results = data.get("results", [])
+                if results and results[0].get("value") is not None:
+                    # Ground stations in PH reporting single value are PM2.5
+                    val = round(float(results[0]["value"]), 2)
+                    return {"pm25": val}
+
         except requests.RequestException as err:
             logger.debug("OpenAQ API request error for %s: %s", city, err)
         except Exception as e:
@@ -510,8 +550,8 @@ class TelemetryIngestor:
 
     def get_city_payload(self, city: str, config: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Generates telemetry: attempts live OpenAQ reading; if unavailable or unchanged,
-        seamlessly activates "Making Air Out of Nothing At All" bounded micro-fluctuation.
+        Generates telemetry: attempts live OpenAQ reading; if unavailable or between ticks,
+        maintains realistic bounded streaming with live anchoring.
         """
         simulator = self.simulators[city]
         live_data = self.fetch_openaq_telemetry(city, config)
@@ -521,24 +561,17 @@ class TelemetryIngestor:
 
         if live_data and "pm25" in live_data:
             current_pm25 = live_data["pm25"]
-            # If the physical reading changed, update simulator base
             if simulator.last_api_reading != current_pm25:
-                simulator.last_api_reading = current_pm25
-                simulator.last_api_update_time = time.time()
+                # Fresh sensor reading received from OpenAQ
+                simulator.update_with_live_telemetry(live_data)
                 source = "OpenAQ-v3-Live"
-                metrics = {
-                    "pm25": current_pm25,
-                    "pm10": live_data.get("pm10", config["baselines"]["pm10"]),
-                    "temperature": live_data.get("temperature", config["baselines"]["temperature"]),
-                    "humidity": live_data.get("humidity", config["baselines"]["humidity"])
-                }
-                simulator.current_state = metrics.copy()
+                metrics = simulator.current_state.copy()
             else:
-                # Sensor value unchanged - apply micro-fluctuations to maintain stream freshness
-                source = "Simulation-Fallback-Unchanged"
+                # Value unchanged between OpenAQ refresh intervals - micro-fluctuate around live anchor
+                source = "OpenAQ-v3-Live"
                 metrics = simulator.step_micro_fluctuation()
         else:
-            # API unavailable, rate-limited, or no key provided
+            # External station offline, no sensor, or rate limited
             source = "Simulation-Fallback-AirMaking"
             metrics = simulator.step_micro_fluctuation()
 

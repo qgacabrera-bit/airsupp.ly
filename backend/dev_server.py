@@ -41,7 +41,7 @@ CITIES = {
     "Naga City": {"sensor_id": "PH-NGA-020", "region": "Luzon", "latitude": 13.6218, "longitude": 123.1948, "pm25": 18.2, "pm10": 34.0, "temp": 29.5, "hum": 84.1},
 
     # --- Visayas ---
-    "Cebu": {"sensor_id": "PH-CEB-003", "region": "Visayas", "latitude": 10.3157, "longitude": 123.8854, "pm25": 21.6, "pm10": 41.2, "temp": 31.0, "hum": 75.0},
+    "Cebu": {"sensor_id": "PH-CEB-003", "region": "Visayas", "latitude": 10.3157, "longitude": 123.8854, "pm25": 11.0, "pm10": 19.8, "temp": 31.0, "hum": 75.0},
     "Mandaue City": {"sensor_id": "PH-MND-021", "region": "Visayas", "latitude": 10.3340, "longitude": 123.9427, "pm25": 23.5, "pm10": 45.0, "temp": 31.2, "hum": 76.1},
     "Iloilo City": {"sensor_id": "PH-ILO-022", "region": "Visayas", "latitude": 10.7202, "longitude": 122.5621, "pm25": 17.8, "pm10": 33.6, "temp": 30.4, "hum": 79.0},
     "Bacolod City": {"sensor_id": "PH-BCD-023", "region": "Visayas", "latitude": 10.6765, "longitude": 122.9509, "pm25": 19.4, "pm10": 36.2, "temp": 30.5, "hum": 78.4},

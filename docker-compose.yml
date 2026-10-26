@@ -67,7 +67,7 @@ services:
       KAFKA_TOPIC: air_supply_stream
       POLL_INTERVAL_SECONDS: 15
       OPENAQ_BASE_URL: https://api.openaq.org/v3
-      OPENAQ_API_KEY: ""
+      OPENAQ_API_KEY: ${OPENAQ_API_KEY}
     depends_on:
       kafka:
         condition: service_healthy
