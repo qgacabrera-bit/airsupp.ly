@@ -8,11 +8,41 @@
  *  - Schema normalization for FastAPI responses
  */
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim();
-const API_BASE_URL = rawApiUrl
-  ? (rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://') ? rawApiUrl : `https://${rawApiUrl}`).replace(/\/$/, '')
-  : '';
-const TIMEOUT_MS = 4000;
+/**
+ * Resolves current API Base URL from:
+ * 1. User runtime localStorage override (airsupply_custom_api_url)
+ * 2. Vite environment variable (VITE_API_URL)
+ * 3. Default empty string (relative path / proxy)
+ */
+export function getApiBaseUrl() {
+  if (typeof window !== 'undefined') {
+    const custom = localStorage.getItem('airsupply_custom_api_url');
+    if (custom && custom.trim()) {
+      const clean = custom.trim().replace(/\/$/, '');
+      return clean.startsWith('http://') || clean.startsWith('https://') ? clean : `https://${clean}`;
+    }
+  }
+  const raw = (import.meta.env.VITE_API_URL || '').trim();
+  if (raw) {
+    const clean = raw.replace(/\/$/, '');
+    return clean.startsWith('http://') || clean.startsWith('https://') ? clean : `https://${clean}`;
+  }
+  return '';
+}
+
+export function setCustomApiUrl(url) {
+  if (typeof window !== 'undefined') {
+    if (url && url.trim()) {
+      const clean = url.trim().replace(/\/$/, '');
+      localStorage.setItem('airsupply_custom_api_url', clean);
+    } else {
+      localStorage.removeItem('airsupply_custom_api_url');
+    }
+  }
+}
+
+const TIMEOUT_MS = 5000;
+
 
 
 // Philippine City Initial Fallbacks (if offline on first boot without cache)
@@ -131,12 +161,17 @@ function normalizeData(result) {
  */
 export async function getLiveMetrics() {
   const cacheKey = 'airsupply_live_cache';
-  const url = `${API_BASE_URL}/api/live`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}/api/live`;
 
   try {
     const res = await fetchWithTimeout(url);
     if (!res.ok) {
       throw new Error(`HTTP Error: ${res.status}`);
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Invalid response format (received ${contentType}). Verify that the API backend URL is correct.`);
     }
     const json = await res.json();
     const data = normalizeData(json);
@@ -158,7 +193,7 @@ export async function getLiveMetrics() {
       error: null
     };
   } catch (err) {
-    console.warn(`[AirSupp.ly API] Live fetch failed (${err.message}). Serving cached fallback...`);
+    console.warn(`[AirSupp.ly API] Live fetch failed (${err.message}) on ${url}. Serving cached fallback...`);
 
     // Attempt localStorage cache recovery
     try {
@@ -198,7 +233,8 @@ export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDa
   if (endDate) queryParams.set('end_date', endDate);
   if (limit) queryParams.set('limit', String(limit));
 
-  const url = `${API_BASE_URL}/api/history?${queryParams.toString()}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}/api/history?${queryParams.toString()}`;
   const cacheKey = `airsupply_history_cache_${city || 'ALL'}`;
 
   try {
@@ -206,8 +242,13 @@ export async function getHistoryMetrics({ city = 'Manila', startDate = '', endDa
     if (!res.ok) {
       throw new Error(`HTTP Error: ${res.status}`);
     }
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      throw new Error(`Invalid response format (received ${contentType}). Verify that the API backend URL is correct.`);
+    }
     const json = await res.json();
     const data = normalizeData(json);
+
 
     // Cache historical batch
     try {
