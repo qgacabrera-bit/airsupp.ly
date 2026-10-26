@@ -1,24 +1,26 @@
-You are a Principal DevOps and Data Platform Engineer. We have built the **AirSupp.ly** platform (Kafka Producer, PySpark Structured Streaming, FastAPI Middleware, and React/Vite PWA). 
+You are a Principal Frontend UI/UX Engineer. We are refining the React PWA dashboard for **AirSupp.ly** (Tagline: *"All Out of Smog"*), our real-time Philippine air quality platform. 
 
-Now, execute **PART 3**: Containerize the entire 6-service architecture so the whole platform boots with a single `docker compose up --build` command without manual terminal orchestration.
+Review the existing frontend code and apply the following **5 UI/UX Polish Upgrades** to enhance visual hierarchy, eliminate clutter, and fix layout grid alignments:
 
-CRITICAL INSTRUCTION: Provide complete, working `Dockerfile`s, `nginx.conf`, and the master `docker-compose.yml` with proper internal Docker DNS networking, healthchecks, and startup dependency chains.
+### 1. Fix Telemetry Card Grid Alignment & Text Wrapping
+- **Card Grid Layout:** Ensure all city status cards use consistent flex/grid heights (`grid-rows-[auto_auto_auto_1fr]`) so the interior weather boxes and advisory footers align neatly across rows.
+- **No Awkward Wrapping:** Wrap PM2.5 and PM10 numeric displays and units in `whitespace-nowrap` containers so values like `35.4 µg/m³` never break onto two lines.
+- **Keep Station Codes:** Leave the subtle station code (e.g., `PH-MNL-001`) below the city name as requested.
 
-### Deliverables for Part 3:
+### 2. Add Visual AQI Progress Bars
+- Add a sleek, thin 4px segmented gradient progress bar (`Good` -> `Moderate` -> `USG` -> `Unhealthy` -> `Hazardous`) directly beneath the AQI score inside every telemetry card.
+- Position a subtle glowing indicator dot on the bar corresponding to the city's current AQI score relative to a 300 max scale.
 
-1. **Python Backend/Producer Image (`/Dockerfile.python`):**
-   - Multi-purpose lightweight `python:3.11-slim` image shared by both the `producer` and `backend` (FastAPI) containers.
-   - Install `requirements.txt` (excluding `pyspark`, which runs in its own Spark container).
+### 3. Clean Up Map Marker Overlaps (National View)
+- On the **Philippine Air Quality Map**, replace bulky floating text labels (`San Fernando, Pampanga 97`, `Calamba 82`, etc.) in the default national view with **compact circular numeric pins** showing *only* the AQI number (e.g., orange circle with `101`) and a subtle pulsing outer ring.
+- Configure full city name/status tooltips to appear cleanly on hover or when a pin is actively selected.
 
-2. **PySpark Streaming Image (`/spark/Dockerfile`):**
-   - Based on `bitnami/spark:3.5` (or `apache/spark-py`).
-   - Pre-install `pymongo` and `python-dotenv`.
-   - Pre-download or configure the `org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2` Maven package in the entrypoint `spark-submit` command so it automatically connects to `kafka:29092` and `mongodb:27017`.
+### 4. Remove Redundancy in the Map Station Inspector
+- Prevent the right-hand panel of the map section from duplicating the exact same 4 weather/AQI cards shown at the top.
+- Turn the "Selected Station" inspector panel into an advanced detail view featuring:
+  - A clean 24-hour mini trend sparkline (Recharts `<AreaChart>` with a subtle gradient fill).
+  - A pollutant breakdown bar showing how close PM2.5 and PM10 are relative to safe daily limits.
 
-3. **React PWA Multi-Stage Image (`/frontend/Dockerfile` & `/frontend/nginx.conf`):**
-   - Stage 1 (`node:20-alpine`): Build the production Vite PWA (`npm run build`), generating the Service Worker (`sw.js`) and `manifest.webmanifest`.
-   - Stage 2 (`nginx:alpine`): Serve the static PWA build on port `80` and configure `nginx.conf` to reverse-proxy `/api/*` requests directly to `http://backend:8000/api/` (eliminating CORS and hardcoded localhost issues) while setting proper `Service-Worker-Allowed` and cache-control headers.
-
-4. **Master `docker-compose.yml`:**
-   - Orchestrate all 6 services (`kafka`, `mongodb`, `producer`, `spark-streaming`, `backend`, `frontend`) on a shared bridge network (`airsupply-net`).
-   - Configure `healthcheck` blocks on `kafka` and `mongodb` so `producer`, `spark-streaming`, and `backend` wait (`condition: service_healthy`) before booting.
+### 5. Smooth State Transitions & Polish
+- Ensure all live polling updates (`/api/live` every 15s) transition smoothly without layout shifting or abrupt flashing.
+- Keep the dark-mode palette (`#0a0e17` slate background with vibrant status accents) clean, high-contrast, and mobile-responsive.
