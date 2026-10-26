@@ -104,7 +104,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent text-slate-100">
+    <div className="min-h-screen flex flex-col bg-transparent text-slate-800 dark:text-slate-100 transition-colors duration-200 relative">
+      {/* Atmospheric Smog Cityscape Backdrop Layer */}
+      <div className="app-bg-backdrop" />
+
       {/* Platform Navigation */}
       <Navbar
         lastUpdated={lastUpdated}
@@ -112,15 +115,15 @@ export default function App() {
         isRefreshing={isRefreshing}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-8 relative z-10">
 
         {/* Section 1: Real-Time City Telemetry Dashboard */}
         <section>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-teal-400" />
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center">
+                <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center transition-colors duration-200">
                   Real-Time Philippine City Telemetry
                   <InfoTooltip text="Real-time atmospheric monitoring across major urban centers. Click any card to visualize its historical trend." />
                 </h2>
@@ -128,21 +131,21 @@ export default function App() {
             </div>
 
             {/* Interactive Sorting Dropdown */}
-            <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-900/80 p-1.5 rounded-xl border border-white/[0.06] shadow-sm">
-              <label htmlFor="card-sort" className="text-xs text-slate-400 flex items-center gap-1.5 pl-1.5 font-medium">
-                <ArrowUpDown className="w-3.5 h-3.5 text-teal-400" />
+            <div className="flex items-center gap-2 self-start sm:self-auto bg-white/80 dark:bg-slate-900/80 p-1.5 rounded-xl border border-slate-200/80 dark:border-white/[0.06] shadow-sm">
+              <label htmlFor="card-sort" className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 pl-1.5 font-medium">
+                <ArrowUpDown className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                 <span className="hidden sm:inline">Sort:</span>
               </label>
               <select
                 id="card-sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-800/90 hover:bg-slate-800 border border-white/[0.08] text-teal-300 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal-400/50 cursor-pointer transition shadow-sm"
+                className="bg-slate-100 dark:bg-slate-800/90 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/[0.08] text-teal-700 dark:text-teal-300 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-teal-400/50 cursor-pointer transition shadow-sm"
               >
-                <option value="aqi_desc" className="bg-slate-900 text-slate-200">AQI: Highest First</option>
-                <option value="aqi_asc" className="bg-slate-900 text-slate-200">AQI: Lowest First (Cleanest)</option>
-                <option value="name_asc" className="bg-slate-900 text-slate-200">Alphabetical: A → Z</option>
-                <option value="name_desc" className="bg-slate-900 text-slate-200">Alphabetical: Z → A</option>
+                <option value="aqi_desc" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">AQI: Highest First</option>
+                <option value="aqi_asc" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">AQI: Lowest First (Cleanest)</option>
+                <option value="name_asc" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">Alphabetical: A → Z</option>
+                <option value="name_desc" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-200">Alphabetical: Z → A</option>
               </select>
             </div>
           </div>
@@ -163,8 +166,8 @@ export default function App() {
                   }}
                   className={`px-3 py-1.5 rounded-xl border transition whitespace-nowrap active:scale-95 ${
                     isActive
-                      ? 'bg-teal-500/20 text-teal-300 border-teal-500/40 font-bold shadow-md shadow-teal-950/20'
-                      : 'bg-slate-900/60 border-white/[0.06] text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+                      ? 'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500/40 font-bold shadow-md shadow-teal-500/10'
+                      : 'bg-white/70 dark:bg-slate-900/60 border-slate-200/80 dark:border-white/[0.06] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80'
                   }`}
                 >
                   {reg} ({count})
@@ -208,10 +211,10 @@ export default function App() {
 
                 {/* Progressive Expansion and Collapse Controls */}
                 {sortedList.length > 4 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800/60">
-                    <span className="text-xs text-slate-400 font-medium order-2 sm:order-1">
-                      Showing <strong className="text-teal-300 font-bold">{displayed.length}</strong> of{' '}
-                      <strong className="text-white font-bold">{sortedList.length}</strong> stations
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-slate-800/60">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium order-2 sm:order-1">
+                      Showing <strong className="text-teal-600 dark:text-teal-300 font-bold">{displayed.length}</strong> of{' '}
+                      <strong className="text-slate-900 dark:text-white font-bold">{sortedList.length}</strong> stations
                     </span>
 
                     <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2">
@@ -219,9 +222,9 @@ export default function App() {
                       {visibleCount < sortedList.length && (
                         <button
                           onClick={() => setVisibleCount((prev) => Math.min(prev + 8, sortedList.length))}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] text-xs font-semibold text-teal-300 hover:text-teal-200 transition active:scale-95 shadow-sm"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/[0.08] text-xs font-semibold text-teal-700 dark:text-teal-300 transition active:scale-95 shadow-sm"
                         >
-                          <ChevronDown className="w-4 h-4 text-teal-400" />
+                          <ChevronDown className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                           <span>See More</span>
                         </button>
                       )}
@@ -230,7 +233,7 @@ export default function App() {
                       {visibleCount < sortedList.length && (
                         <button
                           onClick={() => setVisibleCount(sortedList.length)}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-xs font-semibold text-white transition active:scale-95 shadow-md shadow-teal-950/40"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-xs font-semibold text-white transition active:scale-95 shadow-md shadow-teal-600/20"
                         >
                           <ChevronsDown className="w-4 h-4" />
                           <span>See All ({sortedList.length})</span>
@@ -241,7 +244,7 @@ export default function App() {
                       {visibleCount > 4 && (
                         <button
                           onClick={() => setVisibleCount(4)}
-                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/[0.08] text-xs font-semibold text-slate-300 hover:text-white transition active:scale-95 shadow-sm"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-white/[0.08] text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition active:scale-95 shadow-sm"
                         >
                           <ChevronUp className="w-4 h-4 text-slate-400" />
                           <span>Collapse to Top 4</span>
@@ -293,17 +296,17 @@ export default function App() {
       </main>
 
       {/* Footer & Telemetry Provenance */}
-      <footer className="border-t border-slate-800/80 bg-slate-950/80 py-6 px-4 sm:px-8 text-xs text-slate-400 text-center">
+      <footer className="border-t border-slate-200 dark:border-slate-800/80 bg-white/70 dark:bg-slate-950/80 py-6 px-4 sm:px-8 text-xs text-slate-500 dark:text-slate-400 text-center relative z-10 transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-200">AirSupp.ly</span>
+            <span className="font-bold text-slate-800 dark:text-slate-200">AirSupp.ly</span>
             <span>—</span>
             <span className="italic">"All Out of Smog"</span>
           </div>
-          <div className="text-slate-400">
+          <div className="text-slate-500 dark:text-slate-400">
             Engineered with Apache Kafka KRaft, PySpark Structured Streaming, MongoDB 7.0 & FastAPI.
           </div>
-          <div className="text-slate-400 font-mono">
+          <div className="text-slate-500 dark:text-slate-400 font-mono">
             Philippine Standard Time (PST / UTC+8)
           </div>
         </div>

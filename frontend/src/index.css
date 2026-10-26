@@ -4,40 +4,104 @@
 
 @layer base {
   body {
-    @apply bg-[#080D1A] text-slate-100 font-sans antialiased;
-    background-color: #080D1A;
-    background-image: 
-      /* Subtle top-down studio vignette gently illuminating the dashboard center */
-      radial-gradient(ellipse 85% 55% at 50% -10%, rgba(255, 255, 255, 0.03) 0%, transparent 70%),
-      /* Top-left atmospheric morning light: low-opacity soft teal/sage (3.5%) */
-      radial-gradient(circle 850px at 0% 0%, rgba(45, 212, 191, 0.035) 0%, transparent 70%),
-      /* Bottom-right atmospheric evening light: low-opacity burnt amber (3.5%) */
-      radial-gradient(circle 950px at 100% 100%, rgba(217, 119, 6, 0.035) 0%, transparent 70%),
-      /* Soft peripheral vignette fading outer boundaries into deep midnight shadow */
-      radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(3, 7, 18, 0.6) 100%);
-    background-attachment: fixed;
+    @apply font-sans antialiased transition-colors duration-200;
   }
 }
 
+/* Atmospheric Smog Cityscape Photo Layer */
+.app-bg-backdrop {
+  position: fixed;
+  inset: 0;
+  background-image: url('/airsupply-background.jpg');
+  background-size: cover;
+  background-position: center 25%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.dark .app-bg-backdrop {
+  opacity: 0.08;
+  filter: contrast(120%) brightness(55%) saturate(75%);
+  mix-blend-mode: luminosity;
+}
+
+html:not(.dark) .app-bg-backdrop,
+.light .app-bg-backdrop {
+  opacity: 0.12;
+  filter: contrast(105%) brightness(95%) saturate(85%);
+  mix-blend-mode: multiply;
+}
+
+/* Root Dark Mode Atmospheric Slate & Studio Vignette */
+.dark body {
+  background-color: #080D1A;
+  color: #F8FAFC;
+  background-image: 
+    /* Subtle top-down studio vignette gently illuminating the dashboard center */
+    radial-gradient(ellipse 85% 55% at 50% -10%, rgba(255, 255, 255, 0.035) 0%, transparent 70%),
+    /* Top-left atmospheric morning light: low-opacity soft teal/sage (3.5%) */
+    radial-gradient(circle 850px at 0% 0%, rgba(45, 212, 191, 0.035) 0%, transparent 70%),
+    /* Bottom-right atmospheric evening light: low-opacity burnt amber (3.5%) */
+    radial-gradient(circle 950px at 100% 100%, rgba(217, 119, 6, 0.035) 0%, transparent 70%),
+    /* Soft peripheral vignette fading outer boundaries into deep midnight shadow */
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(3, 7, 18, 0.65) 100%);
+  background-attachment: fixed;
+}
+
+/* Root Light Mode Warm Editorial Paper/Fog */
+html:not(.dark) body,
+.light body {
+  background-color: #F8FAFC;
+  color: #0F172A;
+  background-image: 
+    /* Gentle center illumination */
+    radial-gradient(ellipse 85% 50% at 50% -10%, rgba(20, 184, 166, 0.04) 0%, transparent 60%),
+    /* Top-left soft teal glow */
+    radial-gradient(circle 800px at 0% 0%, rgba(20, 184, 166, 0.035) 0%, transparent 70%),
+    /* Bottom-right warm amber glow */
+    radial-gradient(circle 900px at 100% 100%, rgba(245, 158, 11, 0.035) 0%, transparent 70%),
+    /* Soft outer paper fog border */
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 60%, rgba(226, 232, 240, 0.5) 100%);
+  background-attachment: fixed;
+}
+
 /* Refined Glassmorphism: Depth & Diffused Shadows Over Hard Borders */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.70);
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.72);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
-.glass-panel-hover {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+html:not(.dark) .glass-panel,
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 10px 25px -5px rgba(148, 163, 184, 0.15), 0 0 0 1px rgba(226, 232, 240, 0.6);
 }
 
-.glass-panel-hover:hover {
+.glass-panel-hover {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .glass-panel-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+html:not(.dark) .glass-panel-hover:hover,
+.light .glass-panel-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(203, 213, 225, 1);
+  box-shadow: 0 20px 35px -10px rgba(148, 163, 184, 0.25);
 }
 
 /* Sleek Muted Scrollbar */
@@ -46,12 +110,23 @@
   height: 6px;
 }
 
-::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: #080D1A;
 }
 
-::-webkit-scrollbar-thumb {
+html:not(.dark) ::-webkit-scrollbar-track,
+.light ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+.dark ::-webkit-scrollbar-thumb {
   background: rgba(51, 65, 85, 0.6);
+  border-radius: 9999px;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb,
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.6);
   border-radius: 9999px;
 }
 
@@ -59,30 +134,61 @@
   background: rgba(71, 85, 105, 0.9);
 }
 
-/* Leaflet Dark Theme Overrides */
-.leaflet-container {
+/* Leaflet Overrides */
+.dark .leaflet-container {
   font-family: inherit;
   background-color: #080D1A !important;
 }
 
-.leaflet-popup-content-wrapper {
+html:not(.dark) .leaflet-container,
+.light .leaflet-container {
+  font-family: inherit;
+  background-color: #E2E8F0 !important;
+}
+
+.dark .leaflet-popup-content-wrapper {
   background: rgba(15, 23, 42, 0.95) !important;
   backdrop-filter: blur(16px) !important;
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
   border-radius: 14px !important;
   box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.7) !important;
   padding: 4px !important;
+  color: #F8FAFC !important;
 }
 
-.leaflet-popup-tip {
+html:not(.dark) .leaflet-popup-content-wrapper,
+.light .leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 15px 30px -5px rgba(100, 116, 139, 0.2) !important;
+  padding: 4px !important;
+  color: #0F172A !important;
+}
+
+.dark .leaflet-popup-tip {
   background: rgba(15, 23, 42, 0.95) !important;
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
 }
 
-.leaflet-control-zoom a {
+html:not(.dark) .leaflet-popup-tip,
+.light .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+}
+
+.dark .leaflet-control-zoom a {
   background-color: rgba(15, 23, 42, 0.85) !important;
   color: #94a3b8 !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html:not(.dark) .leaflet-control-zoom a,
+.light .leaflet-control-zoom a {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #334155 !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
 }
 
 .leaflet-control-zoom a:hover {
@@ -91,7 +197,7 @@
 }
 
 /* Leaflet Tooltip Overrides */
-.airsupply-map-tooltip {
+.dark .airsupply-map-tooltip {
   background: rgba(15, 23, 42, 0.95) !important;
   backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -101,6 +207,22 @@
   padding: 4px 8px !important;
 }
 
-.airsupply-map-tooltip::before {
+html:not(.dark) .airsupply-map-tooltip,
+.light .airsupply-map-tooltip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 20px -3px rgba(100, 116, 139, 0.2) !important;
+  color: #0F172A !important;
+  padding: 4px 8px !important;
+}
+
+.dark .airsupply-map-tooltip::before {
   border-top-color: rgba(15, 23, 42, 0.95) !important;
+}
+
+html:not(.dark) .airsupply-map-tooltip::before,
+.light .airsupply-map-tooltip::before {
+  border-top-color: rgba(255, 255, 255, 0.95) !important;
 }

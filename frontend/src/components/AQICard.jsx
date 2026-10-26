@@ -1,47 +1,53 @@
 import React from 'react';
 import { Thermometer, Droplets, ShieldAlert, Sparkles, MapPin, Gauge } from 'lucide-react';
 
-// Refined, desaturated semantic status palette (editorial SaaS styling)
+// Refined, adaptive semantic status palette for Light and Dark modes
 const STATUS_TINTS = {
   good: {
-    bg: 'bg-emerald-950/30',
-    border: 'border-emerald-800/40',
-    text: 'text-emerald-300',
+    bg: 'bg-emerald-500/10 dark:bg-emerald-950/30',
+    border: 'border-emerald-500/30 dark:border-emerald-800/40',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    numberClass: 'text-emerald-600 dark:text-emerald-400',
     dotHex: '#10B981',
     glow: 'rgba(16, 185, 129, 0.3)'
   },
   moderate: {
-    bg: 'bg-amber-950/30',
-    border: 'border-amber-800/40',
-    text: 'text-amber-300',
+    bg: 'bg-amber-500/10 dark:bg-amber-950/30',
+    border: 'border-amber-500/30 dark:border-amber-800/40',
+    text: 'text-amber-800 dark:text-amber-300',
+    numberClass: 'text-amber-600 dark:text-amber-400',
     dotHex: '#F59E0B',
     glow: 'rgba(245, 158, 11, 0.3)'
   },
   sensitive: {
-    bg: 'bg-orange-950/30',
-    border: 'border-orange-800/40',
-    text: 'text-orange-300',
+    bg: 'bg-orange-500/10 dark:bg-orange-950/30',
+    border: 'border-orange-500/30 dark:border-orange-800/40',
+    text: 'text-orange-800 dark:text-orange-300',
+    numberClass: 'text-orange-600 dark:text-orange-400',
     dotHex: '#FB923C',
     glow: 'rgba(251, 146, 60, 0.3)'
   },
   unhealthy: {
-    bg: 'bg-rose-950/30',
-    border: 'border-rose-800/40',
-    text: 'text-rose-300',
+    bg: 'bg-rose-500/10 dark:bg-rose-950/30',
+    border: 'border-rose-500/30 dark:border-rose-800/40',
+    text: 'text-rose-800 dark:text-rose-300',
+    numberClass: 'text-rose-600 dark:text-rose-400',
     dotHex: '#F87171',
     glow: 'rgba(248, 113, 113, 0.3)'
   },
   veryunhealthy: {
-    bg: 'bg-purple-950/30',
-    border: 'border-purple-800/40',
-    text: 'text-purple-300',
+    bg: 'bg-purple-500/10 dark:bg-purple-950/30',
+    border: 'border-purple-500/30 dark:border-purple-800/40',
+    text: 'text-purple-800 dark:text-purple-300',
+    numberClass: 'text-purple-600 dark:text-purple-400',
     dotHex: '#C084FC',
     glow: 'rgba(192, 132, 252, 0.3)'
   },
   hazardous: {
-    bg: 'bg-rose-950/50',
-    border: 'border-rose-800/60',
-    text: 'text-rose-200',
+    bg: 'bg-rose-500/20 dark:bg-rose-950/50',
+    border: 'border-rose-500/40 dark:border-rose-800/60',
+    text: 'text-rose-900 dark:text-rose-200',
+    numberClass: 'text-rose-700 dark:text-rose-300',
     dotHex: '#E11D48',
     glow: 'rgba(225, 29, 72, 0.35)'
   }
@@ -86,34 +92,25 @@ export default function AQICard({ metric, isSelected, onSelect }) {
   const displayCategory = formatCategoryLabel(category);
   const progressPercent = Math.min(100, Math.max(0, (aqi / 300) * 100));
 
-  // Multi-layered ambient glow for active card, ultra-subtle border for standard cards
-  const cardStyle = isSelected
-    ? {
-        borderColor: 'rgba(45, 212, 191, 0.45)',
-        boxShadow: '0 12px 35px -5px rgba(0, 0, 0, 0.5), 0 0 25px -4px rgba(45, 212, 191, 0.20), inset 0 0 15px -8px rgba(45, 212, 191, 0.12)'
-      }
-    : {
-        borderColor: 'rgba(255, 255, 255, 0.06)'
-      };
-
   return (
     <div
       onClick={() => onSelect(city)}
-      style={cardStyle}
       className={`glass-panel glass-panel-hover rounded-2xl p-4 sm:p-5 cursor-pointer relative grid grid-rows-[auto_auto_auto_1fr] gap-3 w-full min-w-0 overflow-hidden transition-all duration-300 h-full ${
-        isSelected ? 'bg-slate-900/90 ring-1 ring-teal-500/30' : 'hover:bg-slate-900/60'
+        isSelected
+          ? 'border-teal-500/60 dark:border-teal-400/50 ring-2 ring-teal-500/30 bg-teal-50/40 dark:bg-slate-900/90 shadow-lg shadow-teal-500/10'
+          : 'border-slate-200/90 dark:border-white/[0.06] hover:bg-slate-50/70 dark:hover:bg-slate-900/60'
       }`}
     >
       {/* Row 1: Header (City, Station Code & Desaturated Status Pill) */}
       <div className="flex items-start justify-between gap-2 min-w-0">
         <div className="min-w-0 flex-1 pr-1">
           <div className="flex items-center gap-1.5 min-w-0">
-            <MapPin className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-teal-400' : 'text-slate-400'}`} />
-            <h2 className="text-base sm:text-lg font-bold tracking-tight text-white truncate" title={city}>
+            <MapPin className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400'}`} />
+            <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white truncate transition-colors duration-200" title={city}>
               {city}
             </h2>
           </div>
-          <span className="text-[10px] font-mono text-slate-400 block truncate mt-0.5">
+          <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block truncate mt-0.5">
             {sensor_id}
           </span>
         </div>
@@ -127,15 +124,15 @@ export default function AQICard({ metric, isSelected, onSelect }) {
       </div>
 
       {/* Row 2: AQI Hero Gauge Display + 4px Segmented Gradient Progress Bar */}
-      <div className="pb-2.5 border-b border-slate-800/60 min-w-0">
+      <div className="pb-2.5 border-b border-slate-200 dark:border-slate-800/60 min-w-0">
         <div className="flex items-baseline justify-between gap-2 min-w-0">
           <div>
-            <div className="flex items-center gap-1 text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-0.5">
+            <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-wider mb-0.5">
               <Gauge className="w-3 h-3 text-slate-400" />
               <span>Air Quality</span>
             </div>
             <div className="flex items-baseline gap-1.5">
-              <span className={`text-4xl sm:text-5xl font-black tracking-tight ${status.text}`}>
+              <span className={`text-4xl sm:text-5xl font-black tracking-tight ${status.numberClass}`}>
                 {aqi}
               </span>
               <span className="text-[11px] text-slate-400 font-mono">/ 300</span>
@@ -144,14 +141,14 @@ export default function AQICard({ metric, isSelected, onSelect }) {
 
           {/* PM Telemetry Highlights */}
           <div className="text-right shrink-0">
-            <div className="text-[11px] text-slate-400 whitespace-nowrap">
-              <span className="text-slate-300 font-medium">PM2.5:</span>{' '}
-              <span className="font-mono text-teal-300 font-bold">{Number(pm25).toFixed(1)}</span>{' '}
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+              <span className="text-slate-600 dark:text-slate-300 font-medium">PM2.5:</span>{' '}
+              <span className="font-mono text-teal-700 dark:text-teal-300 font-bold">{Number(pm25).toFixed(1)}</span>{' '}
               <span className="text-[10px] text-slate-400">µg/m³</span>
             </div>
-            <div className="text-[11px] text-slate-400 mt-1 whitespace-nowrap">
-              <span className="text-slate-300 font-medium">PM10:</span>{' '}
-              <span className="font-mono text-slate-300 font-semibold">{Number(pm10).toFixed(1)}</span>{' '}
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 whitespace-nowrap">
+              <span className="text-slate-600 dark:text-slate-300 font-medium">PM10:</span>{' '}
+              <span className="font-mono text-slate-700 dark:text-slate-300 font-semibold">{Number(pm10).toFixed(1)}</span>{' '}
               <span className="text-[10px] text-slate-400">µg/m³</span>
             </div>
           </div>
@@ -159,7 +156,7 @@ export default function AQICard({ metric, isSelected, onSelect }) {
 
         {/* Restrained 4px Segmented Gradient Progress Bar */}
         <div className="relative w-full mt-2.5 pt-1">
-          <div className="h-1 w-full rounded-full bg-slate-800/80 overflow-hidden relative shadow-inner">
+          <div className="h-1 w-full rounded-full bg-slate-200 dark:bg-slate-800/80 overflow-hidden relative shadow-inner">
             <div
               className="h-full w-full"
               style={{
@@ -175,28 +172,28 @@ export default function AQICard({ metric, isSelected, onSelect }) {
               backgroundColor: status.dotHex,
               boxShadow: `0 0 8px 1px ${status.glow}`
             }}
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full border border-slate-900 pointer-events-none transition-all duration-700 ease-out"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full border border-white dark:border-slate-900 pointer-events-none transition-all duration-700 ease-out"
           />
         </div>
       </div>
 
       {/* Row 3: Secondary Metrics (Temp & Humidity with guaranteed equal row alignment) */}
       <div className="grid grid-cols-2 gap-2 min-w-0">
-        <div className="flex items-center gap-2 bg-slate-900/60 px-2.5 py-1.5 rounded-xl border border-white/[0.04] min-w-0">
-          <Thermometer className="w-3.5 h-3.5 text-rose-300/80 shrink-0" />
+        <div className="flex items-center gap-2 bg-slate-100/70 dark:bg-slate-900/60 px-2.5 py-1.5 rounded-xl border border-slate-200/70 dark:border-white/[0.04] min-w-0">
+          <Thermometer className="w-3.5 h-3.5 text-rose-500 dark:text-rose-300/80 shrink-0" />
           <div className="text-[11px] min-w-0 truncate">
-            <span className="text-slate-400 block text-[9px] uppercase tracking-wider">Temp</span>
-            <span className="font-semibold text-slate-200 whitespace-nowrap">
+            <span className="text-slate-500 dark:text-slate-400 block text-[9px] uppercase tracking-wider">Temp</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
               {Number(temperature).toFixed(1)} °C
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-slate-900/60 px-2.5 py-1.5 rounded-xl border border-white/[0.04] min-w-0">
-          <Droplets className="w-3.5 h-3.5 text-teal-300/80 shrink-0" />
+        <div className="flex items-center gap-2 bg-slate-100/70 dark:bg-slate-900/60 px-2.5 py-1.5 rounded-xl border border-slate-200/70 dark:border-white/[0.04] min-w-0">
+          <Droplets className="w-3.5 h-3.5 text-teal-600 dark:text-teal-300/80 shrink-0" />
           <div className="text-[11px] min-w-0 truncate">
-            <span className="text-slate-400 block text-[9px] uppercase tracking-wider">Humidity</span>
-            <span className="font-semibold text-slate-200 whitespace-nowrap">
+            <span className="text-slate-500 dark:text-slate-400 block text-[9px] uppercase tracking-wider">Humidity</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
               {Number(humidity).toFixed(1)} %
             </span>
           </div>
@@ -205,17 +202,17 @@ export default function AQICard({ metric, isSelected, onSelect }) {
 
       {/* Row 4: Health Advisory & Active Selection Tab (Fills remaining height) */}
       <div className="flex flex-col justify-between min-w-0">
-        <div className="bg-slate-950/50 rounded-xl p-2.5 border border-white/[0.04] h-full flex items-start gap-2 min-w-0">
-          <ShieldAlert className="w-3.5 h-3.5 text-amber-400/80 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-slate-300/90 leading-relaxed line-clamp-2">
+        <div className="bg-slate-100/80 dark:bg-slate-950/50 rounded-xl p-2.5 border border-slate-200/80 dark:border-white/[0.04] h-full flex items-start gap-2 min-w-0">
+          <ShieldAlert className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400/80 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-slate-600 dark:text-slate-300/90 leading-relaxed line-clamp-2">
             {health_advisory}
           </p>
         </div>
 
         {/* Signature Soft Teal Active Indicator */}
         {isSelected && (
-          <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] font-bold text-teal-300 uppercase tracking-wider">
-            <Sparkles className="w-3 h-3 text-teal-400" />
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] font-bold text-teal-600 dark:text-teal-300 uppercase tracking-wider">
+            <Sparkles className="w-3 h-3 text-teal-500 dark:text-teal-400" />
             <span>Active In Trend Chart</span>
           </div>
         )}

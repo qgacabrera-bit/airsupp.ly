@@ -73,6 +73,9 @@ export default defineConfig({
   ],
   server: {
     port: 5173,
+    watch: {
+      ignored: ['**/frontend/assets/**', '**/assets/airsupply background*']
+    },
     proxy: {
       '/api': {
         target: process.env.VITE_BACKEND_TARGET || 'https://airsupply-backend.onrender.com',
