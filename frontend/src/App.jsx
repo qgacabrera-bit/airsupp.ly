@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Navbar from './components/Navbar';
 import AQICard from './components/AQICard';
 import HistoryChart from './components/HistoryChart';
@@ -6,7 +6,18 @@ import AQIScaleReference from './components/AQIScaleReference';
 import PhilippineMap, { CITY_REGION_MAP } from './components/PhilippineMap';
 import { getLiveMetrics, getHistoryMetrics, CITY_FALLBACK_BASELINES } from './api/client';
 
-import { MapPin, RefreshCw, AlertCircle, Info, Sparkles, Filter } from 'lucide-react';
+import { 
+  MapPin, 
+  RefreshCw, 
+  AlertCircle, 
+  Info, 
+  Sparkles, 
+  Filter, 
+  ArrowUpDown, 
+  ChevronDown, 
+  ChevronUp, 
+  ChevronsDown 
+} from 'lucide-react';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
@@ -14,6 +25,8 @@ export default function App() {
   // State: Live Stream initialized with full 30 Philippine stations
   const [liveCities, setLiveCities] = useState(CITY_FALLBACK_BASELINES);
   const [cardRegion, setCardRegion] = useState('All');
+  const [visibleCount, setVisibleCount] = useState(4);
+  const [sortBy, setSortBy] = useState('aqi_desc');
   const [isOffline, setIsOffline] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -132,9 +145,23 @@ export default function App() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800 self-start sm:self-auto">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Sorted by AQI Descending</span>
+            {/* Interactive Sorting Dropdown */}
+            <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-900/70 p-1.5 rounded-xl border border-slate-800 shadow-sm">
+              <label htmlFor="card-sort" className="text-xs text-slate-400 flex items-center gap-1.5 pl-1.5 font-medium">
+                <ArrowUpDown className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="hidden sm:inline">Sort:</span>
+              </label>
+              <select
+                id="card-sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-slate-800/90 hover:bg-slate-800 border border-slate-700/80 text-cyan-300 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer transition shadow-sm"
+              >
+                <option value="aqi_desc" className="bg-slate-900 text-slate-200">AQI: Highest First</option>
+                <option value="aqi_asc" className="bg-slate-900 text-slate-200">AQI: Lowest First (Cleanest)</option>
+                <option value="name_asc" className="bg-slate-900 text-slate-200">Alphabetical: A → Z</option>
+                <option value="name_desc" className="bg-slate-900 text-slate-200">Alphabetical: Z → A</option>
+              </select>
             </div>
           </div>
 
@@ -148,7 +175,10 @@ export default function App() {
               return (
                 <button
                   key={reg}
-                  onClick={() => setCardRegion(reg)}
+                  onClick={() => {
+                    setCardRegion(reg);
+                    setVisibleCount(4); // Reset to top 4 cards on region switch
+                  }}
                   className={`px-3 py-1.5 rounded-xl border transition whitespace-nowrap active:scale-95 ${
                     isActive
                       ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-bold shadow-md shadow-cyan-900/20'
@@ -161,23 +191,86 @@ export default function App() {
             })}
           </div>
 
-          {/* Responsive Grid of City Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {liveCities
-              .filter((metric) => {
-                if (cardRegion === 'All') return true;
-                const reg = metric.region || CITY_REGION_MAP[metric.city] || '';
-                return reg.toLowerCase() === cardRegion.toLowerCase();
-              })
-              .map((metric) => (
-                <AQICard
-                  key={metric.city}
-                  metric={metric}
-                  isSelected={selectedCity.toLowerCase() === metric.city.toLowerCase()}
-                  onSelect={handleCitySelect}
-                />
-              ))}
-          </div>
+          {/* Responsive Grid of City Cards (First 4 cards displayed by default) */}
+          {(() => {
+            // Filter by selected region
+            const regionList = liveCities.filter((metric) => {
+              if (cardRegion === 'All') return true;
+              const reg = metric.region || CITY_REGION_MAP[metric.city] || '';
+              return reg.toLowerCase() === cardRegion.toLowerCase();
+            });
+
+            // Sort according to user preference
+            const sortedList = [...regionList].sort((a, b) => {
+              if (sortBy === 'aqi_desc') return (b.aqi || 0) - (a.aqi || 0);
+              if (sortBy === 'aqi_asc') return (a.aqi || 0) - (b.aqi || 0);
+              if (sortBy === 'name_asc') return a.city.localeCompare(b.city);
+              if (sortBy === 'name_desc') return b.city.localeCompare(a.city);
+              return 0;
+            });
+
+            const displayed = sortedList.slice(0, visibleCount);
+
+            return (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                  {displayed.map((metric) => (
+                    <AQICard
+                      key={metric.city}
+                      metric={metric}
+                      isSelected={selectedCity.toLowerCase() === metric.city.toLowerCase()}
+                      onSelect={handleCitySelect}
+                    />
+                  ))}
+                </div>
+
+                {/* Progressive Expansion and Collapse Controls */}
+                {sortedList.length > 4 && (
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-800/80">
+                    <span className="text-xs text-slate-400 font-medium order-2 sm:order-1">
+                      Showing <strong className="text-cyan-300 font-bold">{displayed.length}</strong> of{' '}
+                      <strong className="text-white font-bold">{sortedList.length}</strong> stations
+                    </span>
+
+                    <div className="flex flex-wrap items-center gap-2 order-1 sm:order-2">
+                      {/* See More Button: adds 2 more rows (+8 cards in 4-column layout) */}
+                      {visibleCount < sortedList.length && (
+                        <button
+                          onClick={() => setVisibleCount((prev) => Math.min(prev + 8, sortedList.length))}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-cyan-300 hover:text-cyan-200 transition active:scale-95 shadow-sm"
+                        >
+                          <ChevronDown className="w-4 h-4 text-cyan-400" />
+                          <span>See More (+2 Rows)</span>
+                        </button>
+                      )}
+
+                      {/* See All Button: expands to reveal all cards */}
+                      {visibleCount < sortedList.length && (
+                        <button
+                          onClick={() => setVisibleCount(sortedList.length)}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600/80 hover:bg-cyan-500 text-xs font-bold text-white transition active:scale-95 shadow-md shadow-cyan-950"
+                        >
+                          <ChevronsDown className="w-4 h-4" />
+                          <span>See All ({sortedList.length})</span>
+                        </button>
+                      )}
+
+                      {/* Collapse Back to Top 4 */}
+                      {visibleCount > 4 && (
+                        <button
+                          onClick={() => setVisibleCount(4)}
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-300 hover:text-white transition active:scale-95 shadow-sm"
+                        >
+                          <ChevronUp className="w-4 h-4 text-slate-400" />
+                          <span>Collapse to Top 4</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </section>
 
         {/* Section 2: Interactive Philippine Air Quality Map */}

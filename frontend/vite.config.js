@@ -75,8 +75,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true
+        target: process.env.VITE_BACKEND_TARGET || 'https://airsupply-backend.onrender.com',
+        changeOrigin: true,
+        secure: false
       }
     }
   }
