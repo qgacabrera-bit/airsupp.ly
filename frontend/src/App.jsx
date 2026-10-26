@@ -3,8 +3,8 @@ import Navbar from './components/Navbar';
 import AQICard from './components/AQICard';
 import HistoryChart from './components/HistoryChart';
 import AQIScaleReference from './components/AQIScaleReference';
-import { getLiveMetrics, getHistoryMetrics, getApiBaseUrl, setCustomApiUrl } from './api/client';
-import { MapPin, RefreshCw, AlertCircle, Info, Sparkles, Link as LinkIcon } from 'lucide-react';
+import { getLiveMetrics, getHistoryMetrics } from './api/client';
+import { MapPin, RefreshCw, AlertCircle, Info, Sparkles } from 'lucide-react';
 
 const LIVE_POLL_INTERVAL_MS = 15000;
 
@@ -23,9 +23,6 @@ export default function App() {
   const [endDate, setEndDate] = useState('');
   const [limit, setLimit] = useState(50);
 
-  // State: Runtime API URL configuration
-  const [apiUrlInput, setApiUrlInput] = useState(getApiBaseUrl() || '');
-  const [isConnectingApi, setIsConnectingApi] = useState(false);
 
   /**
    * Fetch latest live metrics from GET /api/live
@@ -65,15 +62,6 @@ export default function App() {
     }
   }, [selectedCity, startDate, endDate, limit]);
 
-  const handleConnectBackend = () => {
-    setIsConnectingApi(true);
-    setCustomApiUrl(apiUrlInput);
-    fetchLive(true).finally(() => {
-      fetchHistory();
-      setIsConnectingApi(false);
-    });
-  };
-
   // Initial load and 15-second polling loop
   useEffect(() => {
     fetchLive();
@@ -104,38 +92,26 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-8">
-        {/* Offline Notice & Live Backend Connect Bar */}
+        {/* Reconnecting / Cold-Start Notice Banner (if network unreachable) */}
         {isOffline && (
-          <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 text-amber-200 text-xs sm:text-sm animate-fade-in shadow-lg">
-            <div className="flex items-start sm:items-center gap-2.5">
-              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
-              <div>
-                <strong>Offline Cached Mode:</strong> Displaying cached telemetry. Link your live Render backend URL below to activate the 15-second stream.
-              </div>
+          <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3.5 flex items-center justify-between gap-3 text-amber-200 text-xs sm:text-sm animate-fade-in shadow-md">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
+              <span>
+                <strong>Connecting to Stream:</strong> Synchronizing with <code className="bg-slate-900/80 px-1.5 py-0.5 rounded text-cyan-300 font-mono text-xs">airsupply-backend.onrender.com</code>. Serving cached telemetry while the server completes initialization.
+              </span>
             </div>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
-              <div className="relative flex-1 sm:w-80">
-                <LinkIcon className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="https://airsupply-backend-xxxx.onrender.com"
-                  value={apiUrlInput}
-                  onChange={(e) => setApiUrlInput(e.target.value)}
-                  className="w-full bg-slate-900 border border-amber-700/60 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-slate-500 font-mono focus:outline-none focus:border-cyan-400"
-                />
-              </div>
-              <button
-                onClick={handleConnectBackend}
-                disabled={isConnectingApi}
-                className="px-4 py-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 active:scale-95 rounded-lg text-xs font-semibold text-white transition shrink-0 shadow-md flex items-center justify-center gap-1.5"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isConnectingApi ? 'animate-spin' : ''}`} />
-                <span>Connect Live Stream</span>
-              </button>
-            </div>
+            <button
+              onClick={() => fetchLive(true)}
+              disabled={isRefreshing}
+              className="px-3 py-1 bg-amber-900/60 hover:bg-amber-800/80 rounded-lg text-xs font-semibold text-amber-100 border border-amber-700/60 transition shrink-0 flex items-center gap-1"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>Retry</span>
+            </button>
           </div>
         )}
+
 
 
         {/* Section 1: Real-Time City Telemetry Dashboard */}

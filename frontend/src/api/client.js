@@ -8,40 +8,24 @@
  *  - Schema normalization for FastAPI responses
  */
 
+const DEFAULT_API_URL = 'https://airsupply-backend.onrender.com';
+
 /**
- * Resolves current API Base URL from:
- * 1. User runtime localStorage override (airsupply_custom_api_url)
- * 2. Vite environment variable (VITE_API_URL)
- * 3. Default empty string (relative path / proxy)
+ * Resolves current API Base URL automatically.
+ * Defaults directly to https://airsupply-backend.onrender.com in production.
  */
 export function getApiBaseUrl() {
-  if (typeof window !== 'undefined') {
-    const custom = localStorage.getItem('airsupply_custom_api_url');
-    if (custom && custom.trim()) {
-      const clean = custom.trim().replace(/\/$/, '');
-      return clean.startsWith('http://') || clean.startsWith('https://') ? clean : `https://${clean}`;
-    }
-  }
   const raw = (import.meta.env.VITE_API_URL || '').trim();
   if (raw) {
     const clean = raw.replace(/\/$/, '');
     return clean.startsWith('http://') || clean.startsWith('https://') ? clean : `https://${clean}`;
   }
-  return '';
+  return DEFAULT_API_URL;
 }
 
-export function setCustomApiUrl(url) {
-  if (typeof window !== 'undefined') {
-    if (url && url.trim()) {
-      const clean = url.trim().replace(/\/$/, '');
-      localStorage.setItem('airsupply_custom_api_url', clean);
-    } else {
-      localStorage.removeItem('airsupply_custom_api_url');
-    }
-  }
-}
+// Increased timeout to 15s to gracefully handle Render free tier cold-start wakeups
+const TIMEOUT_MS = 15000;
 
-const TIMEOUT_MS = 5000;
 
 
 
