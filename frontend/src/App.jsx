@@ -83,22 +83,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0B1120] text-slate-100">
-      {/* Platform Navigation & Live Connectivity Pill */}
+      {/* Platform Navigation */}
       <Navbar
-        isOffline={isOffline}
         lastUpdated={lastUpdated}
         onRefresh={() => fetchLive(true)}
         isRefreshing={isRefreshing}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-8">
-        {/* Reconnecting / Cold-Start Notice Banner (if network unreachable) */}
+        {/* Reconnecting Notice Banner (only if network fails) */}
         {isOffline && (
           <div className="bg-amber-950/40 border border-amber-800/60 rounded-xl p-3.5 flex items-center justify-between gap-3 text-amber-200 text-xs sm:text-sm animate-fade-in shadow-md">
             <div className="flex items-center gap-2.5">
               <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
               <span>
-                <strong>Connecting to Stream:</strong> Synchronizing with <code className="bg-slate-900/80 px-1.5 py-0.5 rounded text-cyan-300 font-mono text-xs">airsupply-backend.onrender.com</code>. Serving cached telemetry while the server completes initialization.
+                <strong>Connecting to Server:</strong> Synchronizing air quality telemetry. Serving cached data while connecting.
               </span>
             </div>
             <button
@@ -112,8 +111,6 @@ export default function App() {
           </div>
         )}
 
-
-
         {/* Section 1: Real-Time City Telemetry Dashboard */}
         <section>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
@@ -125,9 +122,10 @@ export default function App() {
                 </h2>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Synchronized every 15 seconds across major urban centers. Click any card to visualize its historical trend.
+                Real-time atmospheric monitoring across major urban centers. Click any card to visualize its historical trend.
               </p>
             </div>
+
 
             <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800 self-start sm:self-auto">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
